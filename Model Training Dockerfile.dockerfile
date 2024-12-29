@@ -5,14 +5,22 @@ FROM python:3.9-slim
 # Set the working directory in the container
 WORKDIR /app
 
+# Copy the application code to the container
+COPY train_model.py /app/
+COPY requirements.txt /app/
+COPY train_data.csv /app/
+
 # Copy the requirements file to the container
 COPY requirements.txt .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application code to the container
-COPY train_model.py .
+# Set environment variables for rollback
+ENV ROLLBACK_ENABLED=true
+
+# Create a log directory
+RUN mkdir /app/logs
 
 # Expose the port for the API
 EXPOSE 5001
