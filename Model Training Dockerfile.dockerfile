@@ -5,10 +5,12 @@ FROM python:3.9-slim
 # Set the working directory in the container
 WORKDIR /app
 
+# Copy the requirements file to the container
+COPY requirements.txt .
+
 # Copy the application code to the container
-COPY train_model.py /app/
-COPY requirements.txt /app/
-COPY train_data.csv /app/
+COPY train_model.py .
+COPY wine_quality_assignment.csv ./Data/wine_quality_assignment.csv
 
 # Copy the requirements file to the container
 COPY requirements.txt .
