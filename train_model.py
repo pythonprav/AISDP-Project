@@ -78,7 +78,7 @@ def optimize_random_forest(X_train, y_train):
 def train_model():
     """Train the model and save it."""
     global current_metrics, current_model
-    data_path = request.json.get('filepath', 'wine_quality_assignment.csv')
+    data_path = request.json.get('filepath', './Data/wine_quality_assignment.csv')
     wine = load_and_clean_data(data_path)
     wine = preprocess_quality(wine)
     X_train, X_val, X_test, y_train, y_val, y_test = split_data(wine)
