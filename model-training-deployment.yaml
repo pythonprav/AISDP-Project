@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-training
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: model-training
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: model-training
+    spec:
+      containers:
+      - name: model-training
+        image: pravallikadocker123/model-training:latest
+        ports:
+        - containerPort: 5001
+        volumeMounts:
+        - name: data-volume
+          mountPath: /app/train_data.csv
+        env:
+        - name: ROLLBACK_ENABLED
+          value: "true"
+        readinessProbe:
+          httpGet:
+            path: /train
+            port: 5001
+          initialDelaySeconds: 5
+          periodSeconds: 10
+      volumes:
+      - name: data-volume
+        hostPath:
+          path: /path/to/train_data.csv
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-training-service
+spec:
+  selector:
+    app: model-training
+  ports:
+    - protocol: TCP
+      port: 5001
+      targetPort: 5001
+  type: LoadBalancer
