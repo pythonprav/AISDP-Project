@@ -2,8 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: model-training
+  labels:
+    app: model-training
 spec:
-  replicas: 2
+  replicas: 2  # Ensure high availability
   selector:
     matchLabels:
       app: model-training
@@ -24,25 +26,46 @@ spec:
         - containerPort: 5001
         volumeMounts:
         - name: data-volume
-          mountPath: /app/train_data.csv
+          mountPath: /app/Data  # Mount the data directory into the container
         env:
         - name: ROLLBACK_ENABLED
-          value: "true"
+          value: "true"  # Enable rollback for safer deployments
+        - name: TRAINING_FILE_PATH
+          value: "/app/Data/wine_quality_assignment.csv"  # Path to the training data
+        - name: LOG_LEVEL
+          value: "DEBUG"  # Set log verbosity
         readinessProbe:
           httpGet:
             path: /train
             port: 5001
           initialDelaySeconds: 5
           periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5001
+          initialDelaySeconds: 10
+          periodSeconds: 20
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "512Mi"
+            cpu: "1"
       volumes:
       - name: data-volume
         hostPath:
-          path: /path/to/train_data.csv
+          path: C:/Users/srira/OneDrive/Documents/GitHub/AISDP-Project/Data  # Adjust this to your actual file path
+          type: Directory
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: model-training-service
+  annotations:
+    autoscaling.kubernetes.io/metrics: >-
+      {"type":"Resource","resource":{"name":"cpu","targetAverageUtilization":50}}  # Autoscaling on CPU utilization
 spec:
   selector:
     app: model-training
@@ -50,4 +73,4 @@ spec:
     - protocol: TCP
       port: 5001
       targetPort: 5001
-  type: LoadBalancer
+  type: LoadBalancer  # Use LoadBalancer for external access
