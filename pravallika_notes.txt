@@ -32,3 +32,7 @@
    ```
 
 This script ensures your training code behaves correctly and integrates seamlessly with the API. Let me know if you need further modifications!
+
+github cloning link:
+
+ git clone --branch pravallika-branch https://pythonprav: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@github.com/pythonprav/AISDP-Project.git
