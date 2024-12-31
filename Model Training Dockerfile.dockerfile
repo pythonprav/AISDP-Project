@@ -7,7 +7,7 @@ WORKDIR /app
 
 # Copy the application code to the container
 COPY train_model.py .
-COPY wine_quality_assignment.csv ./Data/wine_quality_assignment.csv
+COPY Data/wine_quality_assignment.csv ./Data/wine_quality_assignment.csv
 
 # Copy the requirements file to the container
 COPY requirements.txt .
