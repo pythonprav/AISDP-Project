@@ -6,7 +6,7 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Copy the application code to the container
-COPY train_model.py .
+COPY Model-Training/train_model.py .
 COPY ../Data/wine_quality_assignment.csv ./Data/wine_quality_assignment.csv
 
 # Copy the requirements file to the container
