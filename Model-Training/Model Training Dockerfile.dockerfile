@@ -7,10 +7,10 @@ WORKDIR /app
 
 # Copy the application code to the container
 COPY train_model.py .
-COPY Data ./Data
+COPY ../Data/wine_quality_assignment.csv ./Data/wine_quality_assignment.csv
 
 # Copy the requirements file to the container
-COPY requirements.txt .
+COPY ../requirements.txt .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
