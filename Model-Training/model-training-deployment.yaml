@@ -56,7 +56,7 @@ spec:
       volumes:
       - name: data-volume
         hostPath:
-          path: C:/Users/srira/OneDrive/Documents/GitHub/AISDP-Project/Data  # Adjust this to your actual file path
+          path: /home/pravallika/AISDP-Project/Data
           type: Directory
 ---
 apiVersion: v1
