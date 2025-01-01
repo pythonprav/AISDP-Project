@@ -8,7 +8,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /home/pravallika/AISDP-Project/Data
+    path: /mnt/AISDP-Project/Data
   persistentVolumeReclaimPolicy: Retain
 ---
 kind: PersistentVolumeClaim

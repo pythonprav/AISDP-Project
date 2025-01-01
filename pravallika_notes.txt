@@ -36,3 +36,6 @@ This script ensures your training code behaves correctly and integrates seamless
 github cloning link:
 
  git clone --branch pravallika-branch https://pythonprav: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@github.com/pythonprav/AISDP-Project.git
+
+ build docker file code:
+ docker build -f Model-Training/"Model Training Dockerfile.dockerfile" -t pravallikadocker123/model-training:latest .

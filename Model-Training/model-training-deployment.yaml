@@ -55,9 +55,8 @@ spec:
             cpu: "1"
       volumes:
       - name: data-volume
-        hostPath:
-          path: /home/pravallika/AISDP-Project/Data
-          type: Directory
+        persistentVolumeClaim:
+          claimName: data-pvc  
 ---
 apiVersion: v1
 kind: Service
