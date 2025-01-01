@@ -8,7 +8,8 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /mnt/c/Users/srira/OneDrive/Documents/GitHub/AISDP-Project/Data
+    path: /home/pravallika/AISDP-Project/Data
+  persistentVolumeReclaimPolicy: Retain
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
