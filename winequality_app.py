@@ -35,6 +35,6 @@ def predict():
     result = response.json()
 
     return render_template('dashboard.html', prediction=result["prediction"], probability=result["probability"])
-
+#main
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5003)
