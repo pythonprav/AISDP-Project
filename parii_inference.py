@@ -5,13 +5,15 @@ import traceback
 # Initialize Flask app
 app = Flask(__name__)
 
-# Load the trained model
-try:
-    model = joblib.load("model.pkl")  # Update with your actual model file path
-    print("Model loaded successfully.")
-except Exception as e:
-    print(f"Error loading model: {e}")
-    model = None
+# Mock model for testing purposes
+class MockModel:
+    def predict(self, X):
+        # Simulate predictions (random wine quality values between 3 and 9)
+        return np.random.randint(3, 10, size=len(X))
+
+# Initialize the mock model
+model = MockModel()
+print("Using a mock model for testing.")
 
 # Define the /predict endpoint
 @app.route('/predict', methods=['POST'])
