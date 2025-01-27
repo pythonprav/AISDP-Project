@@ -25,13 +25,19 @@ def load_and_clean_data(filepath):
     """Load and clean the dataset."""
     post_message("Loading and Cleaning Data...")
     wine = pd.read_csv(filepath)
-    wine.drop(['Sample', 'color'], axis=1, inplace=True)
+    
+    # Binary encoding for 'color' column
+    wine['color'] = wine['color'].apply(lambda x: 1 if x.lower() == 'red' else 0)
+    
+    wine.drop(['Sample'], axis=1, inplace=True)
     wine.dropna(inplace=True)
     wine.drop_duplicates(inplace=True)
     wine = wine[wine['quality'] != 2]  # Removing rows with quality '2'
     wine.reset_index(drop=True, inplace=True)
+    
     post_message("Data Loaded and Cleaned Successfully.")
     return wine
+
 
 
 def preprocess_quality(wine):
