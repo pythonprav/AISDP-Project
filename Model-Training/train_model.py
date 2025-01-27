@@ -37,18 +37,20 @@ def load_and_clean_data(filepath):
             raise FileNotFoundError(f"File not found: {filepath}")
         
         wine = pd.read_csv(filepath)  # Use filepath passed from the function
-        wine.drop(['Sample', 'color'], axis=1, inplace=True)
+        wine.drop(['Sample'], axis=1, inplace=True)
         wine.dropna(inplace=True)
         wine.drop_duplicates(inplace=True)
         wine = wine[wine['quality'] != 2]  # Remove rows with quality '2'
         wine.reset_index(drop=True, inplace=True)
+        
+        # Binary encoding for 'color' column
+        wine['color'] = wine['color'].apply(lambda x: 1 if x.lower() == 'red' else 0)
+        
         post_message("Data Loaded and Cleaned Successfully.")
         return wine
     except Exception as e:
         logging.error(f"Error loading and cleaning data: {e}")
         raise
-
-
 
 def preprocess_quality(wine):
     """Preprocess quality column into categorical labels."""
