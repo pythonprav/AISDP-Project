@@ -81,7 +81,6 @@ def evaluate_model(y_true, y_pred):
         'f1': f1_score(y_true, y_pred, average='macro')
     }
 
-
 def optimize_random_forest(X_train, y_train):
     """Optimize Random Forest classifier using GridSearchCV."""
     post_message("Optimizing Random Forest Model...")
