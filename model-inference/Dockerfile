@@ -1,4 +1,3 @@
-# Model Inference Dockerfile
 # Use an official Python runtime as the base image
 FROM python:3.9-slim
 
@@ -11,13 +10,13 @@ COPY requirements.txt .
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application code and model to the container
+# Copy the inference script and any necessary files to the container
 COPY inference.py .
-COPY model.pkl ./model.pkl  
-# Replace 'model.pkl' with your model file name
+COPY optimized_rf_model.pkl .
+COPY ../data/feature_names.csv ./data/
 
-# Expose the port for the inference API
-EXPOSE 5002
+# Expose the port the app runs on
+EXPOSE 5000
 
-# Define the command to run the inference API
+# Define the command to run the application
 CMD ["python", "inference.py"]
