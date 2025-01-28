@@ -3,6 +3,3 @@ numpy
 Flask
 scikit-learn
 joblib
-
-
-
