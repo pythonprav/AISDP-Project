@@ -9,21 +9,20 @@ app = Flask(__name__)
 model_path = "model-training/optimized_rf_model.pkl"
 model = joblib.load(model_path)
 
-# Extract feature names dynamically from the preprocessed dataset
-data_path = "data/cleaned_wine_quality.csv"
-df = pd.read_csv(data_path)
-feature_names = df.drop(columns=["quality"]).columns.tolist()
+# Load feature names from the CSV
+feature_names_path = "data/feature_names.csv"
+feature_names = pd.read_csv(feature_names_path)["feature_name"].tolist()
 
 @app.route("/predict", methods=["POST"])
 def predict():
     """
-    Predict the wine quality using the trained model.
+    Predict wine quality using the trained model.
     """
     try:
         # Parse the input JSON data
         input_data = request.get_json()
-        
-        # Convert JSON to DataFrame
+
+        # Convert JSON to DataFrame using the feature names
         input_df = pd.DataFrame(input_data, columns=feature_names)
         
         # Make predictions
