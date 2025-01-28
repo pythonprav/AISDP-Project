@@ -13,7 +13,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the application code to the container
 COPY train_model.py .
-COPY test_train.py .
 COPY data/ /app/data/
 
 # Expose the port for the API
