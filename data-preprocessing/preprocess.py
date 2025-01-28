@@ -78,7 +78,7 @@ def preprocess_data():
         df = preprocess_data_logic(df)
 
         # Define output directory and ensure it exists
-        output_dir = "Data"
+        output_dir = "data"
         os.makedirs(output_dir, exist_ok=True)
         output_filepath = os.path.join(output_dir, "cleaned_wine_quality.csv")
 

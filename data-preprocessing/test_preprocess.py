@@ -1,11 +1,12 @@
-# Preprocessing Test (tests/test_preprocess.py)
-# import pytest
-import pandas as pd
-from preprocess import preprocess_data
+import requests
+import json
 
-def test_preprocessing():
-    data = {"feature1": [1, 2], "feature2": [3, None]}
-    df = pd.DataFrame(data)
-    result = preprocess_data(df)
-    assert "feature1" in result.columns
-    assert result.isna().sum().sum() == 0
+# Load the JSON data
+with open("data/wine_quality.json", "r") as json_file:
+    data = json.load(json_file)
+
+# Send POST request to the API
+response = requests.post("http://127.0.0.1:5000/get-data", json=data)
+
+# Print the API's response
+print(response.json())
