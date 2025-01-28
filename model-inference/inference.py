@@ -1,27 +1,43 @@
-# Model Inference (inference.py)
 from flask import Flask, jsonify, request
-import joblib
 import pandas as pd
+import joblib
 
+# Initialize Flask app
 app = Flask(__name__)
 
-# Load the saved model
-model = joblib.load("model.pkl")
+# Load the trained model
+model_path = "model-training/optimized_rf_model.pkl"
+model = joblib.load(model_path)
 
-@app.route('/predict', methods=['POST'])
+# Extract feature names dynamically from the preprocessed dataset
+data_path = "data/cleaned_wine_quality.csv"
+df = pd.read_csv(data_path)
+feature_names = df.drop(columns=["quality"]).columns.tolist()
+
+@app.route("/predict", methods=["POST"])
 def predict():
-    # Example: Receive input features via JSON
-    input_data = request.get_json()
-    df = pd.DataFrame([input_data])
+    """
+    Predict the wine quality using the trained model.
+    """
+    try:
+        # Parse the input JSON data
+        input_data = request.get_json()
+        
+        # Convert JSON to DataFrame
+        input_df = pd.DataFrame(input_data, columns=feature_names)
+        
+        # Make predictions
+        predictions = model.predict(input_df).tolist()
+        
+        return jsonify({
+            "message": "Prediction successful",
+            "predictions": predictions
+        })
+    except Exception as e:
+        return jsonify({
+            "message": "Prediction failed",
+            "error": str(e)
+        }), 500
 
-    # Predict using the model
-    prediction = model.predict(df)
-    probability = model.predict_proba(df).max()
-
-    return jsonify({
-        "prediction": int(prediction[0]),
-        "probability": float(probability)
-    })
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5002)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
