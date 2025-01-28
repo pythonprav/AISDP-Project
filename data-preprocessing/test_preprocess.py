@@ -1,12 +1,19 @@
 import requests
 import json
 
-# Load the JSON data
-with open("data/wine_quality.json", "r") as json_file:
-    data = json.load(json_file)
+# URL of your running Flask app
+url = "http://127.0.0.1:5000/get-data"
 
-# Send POST request to the API
-response = requests.post("http://127.0.0.1:5000/get-data", json=data)
+# Path to your JSON file
+json_file_path = "../data/wine_quality.json"
 
-# Print the API's response
-print(response.json())
+# Read the JSON data
+with open(json_file_path, "r") as file:
+    json_data = json.load(file)
+
+# Send a POST request to the Flask endpoint
+response = requests.post(url, json=json_data)
+
+# Print the response from the Flask server
+print("Status Code:", response.status_code)
+print("Response JSON:", response.json())

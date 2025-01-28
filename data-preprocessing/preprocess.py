@@ -34,12 +34,12 @@ def preprocess_data_logic(df):
 
     # Remove rows where 'quality' equals 2
     if 'quality' in df.columns:
-        df = df[df['quality'] != 2]
+        df = df[df['quality'] != 2].copy()  # Explicitly create a copy
 
     # Encode 'color' column if it exists
     if 'color' in df.columns:
         encoder = LabelEncoder()
-        df['color'] = encoder.fit_transform(df['color'])
+        df.loc[:, 'color'] = encoder.fit_transform(df['color'])  # Use `.loc` for modification
 
     # Map 'quality' values to star ratings if it exists
     if 'quality' in df.columns:
@@ -57,8 +57,8 @@ def preprocess_data_logic(df):
             '4 Star': 4,
             '5 Star': 5
         }
-        df['quality'] = df['quality'].map(quality_map)  # Map to star ratings
-        df['quality'] = df['quality'].map(star_encoding)  # Encode star ratings to numbers
+        # Perform the two mappings in a single step to avoid intermediate type conflicts
+        df.loc[:, 'quality'] = df['quality'].map(quality_map).map(star_encoding).astype(int)
 
     return df
 
