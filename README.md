@@ -1,4 +1,4 @@
-.
+```bash
 ├── README.md  
 ├── data-preprocessing
 │   ├── Dockerfile           # Dockerfile for containerizing the preprocessing service.
@@ -16,3 +16,4 @@
 └── web-application
     ├── Dockerfile           # Dockerfile for containerizing the web application.
     └── winequality_app.py   # Backend and frontend integration for user interaction.
+```
