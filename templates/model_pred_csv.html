@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wine Quality - CSV Input</title>
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+    <header>
+      <h1>Wine Quality Testing (CSV Input)</h1>
+      <nav>
+        <a href="index.html" class="btn">Back to Home</a>
+      </nav>
+    </header>
+  
+    <main class="csv-container container">
+      <h2>Upload Your CSV File</h2>
+      <form action="/upload_csv" method="POST" enctype="multipart/form-data">
+        <label for="csvFile">Select CSV:</label>
+        <input type="file" name="csvFile" id="csvFile" accept=".csv" required />
+        <button type="submit" class="btn">Submit CSV</button>
+      </form>
+  
+      <div id="outputCSV">
+        <h2>Result</h2>
+        <p>Your results will appear here after processing the CSV.</p>
+      </div>
+    </main>
+  
+    <footer>
+      <p>&copy; 2025 My Wine Quality App</p>
+    </footer>
+  </body>
+  
+</html>
