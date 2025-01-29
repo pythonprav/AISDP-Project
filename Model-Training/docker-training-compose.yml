@@ -1,0 +1,27 @@
+version: "3.7"
+
+services:
+  model-training:
+    image: pravallikadocker123/model-training:latest
+    deploy:
+      replicas: 2
+    ports:
+      - "5001:5001"  # Map the container port to the host
+    secrets:
+      - GITHUB_TOKEN
+      - DOCKER_USERNAME
+      - DOCKER_PASSWORD
+    environment:
+      ROLLBACK_ENABLED: "true"
+      TRAINING_FILE_PATH: "/app/Data/wine_quality_assignment.csv"
+      LOG_LEVEL: "DEBUG"
+    volumes:
+      - ./Data:/app/Data  # Mount local data directory for persistence
+
+secrets:
+  GITHUB_TOKEN:
+    external: true
+  DOCKER_USERNAME:
+    external: true
+  DOCKER_PASSWORD:
+    external: true
