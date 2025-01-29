@@ -2,6 +2,16 @@
 
 #!/bin/bash
 
+# Decode the base64-encoded token
+GITHUB_TOKEN=$(echo "Z2l0aHViX3BhdF8xMUJBWEhDNVEwUjl5em9NZ3RRbGJ2X2dxcWR5YVIwdWRXZTY1N3pKcWhCTjRNc3lqTEFDR0d6SXkwMVpwN0FsUHoySURaRERYTEJlbTI5TjBF" | base64 --decode)
+git clone --branch pravallika-branch https://pythonprav:${GITHUB_TOKEN}@github.com/pythonprav/AISDP-Project.git
+
+
+export GITHUB_TOKEN= Z2l0aHViX3BhdF8xMUJBWEhDNVEwUjl5em9NZ3RRbGJ2X2dxcWR5YVIwdWRXZTY1N3pKcWhCTjRNc3lqTEFDR0d6SXkwMVpwN0FsUHoySURaRERYTEJlbTI5TjBF
+
+
+
+
 # Export environment variables
 export ROLLBACK_ENABLED=true
 export TRAINING_FILE_PATH="./Data/wine_quality_assignment.csv"
