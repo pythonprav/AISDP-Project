@@ -8,8 +8,20 @@ import json
 import os
 import logging
 
-# Configure logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+# Load environment variables
+TRAINING_FILE_PATH = os.getenv("TRAINING_FILE_PATH", "../Data/wine_quality_assignment.csv")
+SAVED_MODEL_DIR = os.getenv("SAVED_MODEL_PATH", "./saved_model")
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+
+# Load RandomForest parameters from environment variables
+RF_N_ESTIMATORS = int(os.getenv("RANDOM_FOREST_N_ESTIMATORS", "100"))
+RF_MAX_DEPTH = int(os.getenv("RANDOM_FOREST_MAX_DEPTH", "20")) if os.getenv("RANDOM_FOREST_MAX_DEPTH") != "None" else None
+RF_MIN_SAMPLES_SPLIT = int(os.getenv("RANDOM_FOREST_MIN_SAMPLES_SPLIT", "2"))
+RF_MIN_SAMPLES_LEAF = int(os.getenv("RANDOM_FOREST_MIN_SAMPLES_LEAF", "1"))
+RF_MAX_FEATURES = os.getenv("RANDOM_FOREST_MAX_FEATURES", "sqrt")
+
+# Update logging level
+logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -17,7 +29,6 @@ app = Flask(__name__)
 # Global variables for storing metrics and model
 current_metrics = None
 current_model = None
-
 
 def post_message(message):
     """
@@ -91,29 +102,47 @@ def split_data(wine):
         raise
 
 
+
 def optimize_random_forest(X_train, y_train):
     """Optimize Random Forest classifier using GridSearchCV."""
     try:
-        post_message("Optimizing Random Forest Model...")
-        rf = RandomForestClassifier(random_state=42, class_weight='balanced', n_jobs=-1)
+        post_message("Optimizing Random Forest Model with GridSearchCV...")
+        
+        # Define the base RandomForest model
+        rf = RandomForestClassifier(
+            random_state=42,
+            class_weight="balanced",
+            n_jobs=-1
+        )
+        
+        # Define the hyperparameter grid
         param_grid = {
-            'n_estimators': [100, 150],
-            'max_depth': [10, 20, None],
-            'min_samples_split': [2, 5],
-            'min_samples_leaf': [1, 2],
-            'max_features': ['sqrt', None]
+            'n_estimators': [RF_N_ESTIMATORS, RF_N_ESTIMATORS + 50],
+            'max_depth': [RF_MAX_DEPTH, None],
+            'min_samples_split': [RF_MIN_SAMPLES_SPLIT, RF_MIN_SAMPLES_SPLIT + 2],
+            'min_samples_leaf': [RF_MIN_SAMPLES_LEAF, RF_MIN_SAMPLES_LEAF + 1],
+            'max_features': [RF_MAX_FEATURES, 'log2']
         }
+        
+        # Perform GridSearchCV
         grid_search = GridSearchCV(
-            estimator=rf, param_grid=param_grid, cv=3, n_jobs=-1, scoring='accuracy'
+            estimator=rf,
+            param_grid=param_grid,
+            cv=3,  # 3-fold cross-validation
+            scoring='accuracy',
+            n_jobs=-1,
+            verbose=2
         )
         grid_search.fit(X_train, y_train)
-        post_message(f"Random Forest Model Optimized Successfully. Best Parameters: {grid_search.best_params_}")
+        
+        post_message(f"GridSearchCV completed. Best Parameters: {grid_search.best_params_}")
+        
+        # Return the best model
         return grid_search.best_estimator_
     except Exception as e:
-        logging.error(f"Error optimizing Random Forest: {e}")
+        logging.error(f"Error during GridSearchCV: {e}")
         raise
-
-
+    
 @app.route('/train', methods=['POST'])
 def train_model():
     """Train the model and save it."""
@@ -159,16 +188,22 @@ def retrain_model():
     """Retrain the model."""
     return train_model()
 
+import os
+# Define the path to the saved_model folder
+SAVED_MODEL_DIR = os.path.join(os.getcwd(), "saved_model")
 
 @app.route('/save-model', methods=['POST'])
 def save_model():
-    """Save the trained model if requested."""
+    """Save the trained model in the saved_model folder."""
     global current_model
     try:
         if current_model:
-            joblib.dump(current_model, "model.pkl")
-            post_message("Model saved successfully.")
-            return jsonify({"message": "Model saved successfully!"})
+            # Create the saved_model folder if it doesn't exist
+            os.makedirs(SAVED_MODEL_DIR, exist_ok=True)
+            model_path = os.path.join(SAVED_MODEL_DIR, "model.pkl")
+            joblib.dump(current_model, model_path)
+            post_message(f"Model saved successfully at {model_path}.")
+            return jsonify({"message": f"Model saved successfully at {model_path}!"})
         else:
             return jsonify({"message": "No model available to save!"})
     except Exception as e:

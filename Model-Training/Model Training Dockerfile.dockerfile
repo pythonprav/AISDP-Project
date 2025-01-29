@@ -1,4 +1,5 @@
 # #Model Training Dockerfile
+# Model Training Dockerfile
 # Use an official Python runtime as the base image
 FROM python:3.9-slim
 
@@ -10,7 +11,7 @@ COPY Model-Training/train_model.py ./Model-Training/
 COPY Data/wine_quality_assignment.csv ./Data/
 
 # Copy the requirements file to the container
-COPY requirements.txt .
+COPY Model-Training/requirements.txt .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt

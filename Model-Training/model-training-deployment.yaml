@@ -5,7 +5,7 @@ metadata:
   labels:
     app: model-training
 spec:
-  replicas: 2  # Ensure high availability
+  replicas: 2  # High availability
   selector:
     matchLabels:
       app: model-training
@@ -34,21 +34,13 @@ spec:
           value: "/app/Data/wine_quality_assignment.csv"  # Path to the training data
         - name: LOG_LEVEL
           value: "DEBUG"  # Set log verbosity
-        - name: GITHUB_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: github-token
-              key: GITHUB_TOKEN
-        - name: DOCKER_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: docker-credentials
-              key: DOCKER_USERNAME
-        - name: DOCKER_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: docker-credentials
-              key: DOCKER_PASSWORD
+        envFrom:
+        - configMapRef:
+            name: model-training-config  # Includes TRAINING_FILE_PATH, LOG_LEVEL, etc.
+        - secretRef:
+            name: github-token            
+        - secretRef:
+            name: docker-credentials  # Includes DOCKER_USERNAME, DOCKER_PASSWORD
         readinessProbe:
           httpGet:
             path: /train
@@ -68,7 +60,13 @@ spec:
           limits:
             memory: "512Mi"
             cpu: "1"
+        volumeMounts:
+        - name: data-volume
+          mountPath: /app/Data
       volumes:
       - name: data-volume
         persistentVolumeClaim:
-          claimName: data-pvc  
+          claimName: data-pvc  # Dynamic volume provisioning
+
+
+
