@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 import pandas as pd
-import joblib  # or pickle, if you saved your model that way
+import joblib  
 
 app = Flask(__name__)
 
@@ -33,23 +33,37 @@ def model_pred_csv():
 @app.route("/model_pred_manual", methods=["GET", "POST"])
 def model_pred_manual():
     if request.method == "POST":
-        # Grab form data
-        fixed_acid = float(request.form.get("fixed_acid"))
-        volatile_acid = float(request.form.get("volatile_acid"))
-        citric_acid   = float(request.form.get("citric_acid"))
-        # etc. for all features...
-        color         = request.form.get("color")  # "red" or "white", if used
-        
-        # Put features in a list or dataframe row
-        X = pd.DataFrame([{
-            "fixed_acidity": fixed_acid,
-            "volatile_acidity": volatile_acid,
+        fixed_acidity = float(request.form.get("fixed_acidity"))
+        volatile_acidity = float(request.form.get("volatile_acidity"))
+        citric_acid = float(request.form.get("citric_acid"))
+        residual_sugar = float(request.form.get("residual_sugar"))
+        chlorides = float(request.form.get("chlorides"))
+        free_sulfur_dioxide = float(request.form.get("free_sulfur_dioxide"))
+        total_sulfur_dioxide = float(request.form.get("total_sulfur_dioxide"))
+        density = float(request.form.get("density"))
+        pH = float(request.form.get("pH"))  # Include pH
+        sulphates = float(request.form.get("sulphates"))
+        alcohol = float(request.form.get("alcohol"))
+        color = request.form.get("color")  # "red" or "white"
+
+        # Put features in a single DataFrame row
+        feature_df = pd.DataFrame([{
+            "fixed_acidity": fixed_acidity,
+            "volatile_acidity": volatile_acidity,
             "citric_acid": citric_acid,
-            # ...
+            "residual_sugar": residual_sugar,
+            "chlorides": chlorides,
+            "free_sulfur_dioxide": free_sulfur_dioxide,
+            "total_sulfur_dioxide": total_sulfur_dioxide,
+            "density": density,
+            "pH": pH,
+            "sulphates": sulphates,
+            "alcohol": alcohol,
+            "color": color  # might need encoding if your model expects numeric
         }])
         
         # Predict
-        prediction = model.predict(X)[0]
+        prediction = model.predict(feature_df)[0]
         
         # Return the same page but show the prediction
         return render_template("model_pred_manual.html", prediction=prediction)

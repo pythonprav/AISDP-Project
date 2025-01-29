@@ -21,3 +21,22 @@ EXPOSE 5003
 
 # Define the command to run the web application
 CMD ["python", "app.py"]
+
+
+
+# version: '3'
+# services:
+#   model-service:
+#     build: ./model_service
+#     container_name: model-service
+#     ports:
+#       - "5001:5001"
+
+#   flask-app:
+#     build: ./flask_app
+#     container_name: flask-app
+#     ports:
+#       - "5000:5000"
+#     depends_on:
+#       - model-service
+
