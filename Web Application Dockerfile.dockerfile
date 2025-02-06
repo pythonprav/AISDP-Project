@@ -19,7 +19,7 @@ EXPOSE 5003
 # Set environment variables for Flask and model storage
 ENV FLASK_APP=winequality_app.py
 ENV FLASK_RUN_HOST=0.0.0.0
-ENV MODEL_PATH=/app/models/optimized_rf_model.pkl
+ENV MODEL_PATH=/app/models/saved_model.pkl
 ENV UPLOAD_FOLDER=/app/uploads
 
 # Command to run the Flask application
