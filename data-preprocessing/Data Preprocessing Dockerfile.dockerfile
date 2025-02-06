@@ -6,8 +6,7 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Copy the requirements file to the container
-COPY requirements.txt .
-COPY wine_quality_assignment.csv .
+COPY ../requirements.txt .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
