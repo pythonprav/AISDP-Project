@@ -1,30 +1,28 @@
 import requests
 import json
 
-# Define the endpoint
-url = "http://127.0.0.1:5000/predict"
+# Define API endpoint
+url = "http://127.0.0.1:5000/predict-wine-quality"
 
-# Define sample input data (make sure it matches feature names)
-sample_data = [
-    {
-        "fixed_acidity": 7.4,
-        "volatile_acidity": 0.7,
-        "citric_acid": 0,
-        "residual_sugar": 1.9,
-        "chlorides": 0.076,
-        "free_sulfur_dioxide": 11,
-        "total_sulfur_dioxide": 34,
-        "density": 0.9978,
-        "pH": 3.51,
-        "sulphates": 0.56,
-        "alcohol": 9.4,
-        "color": 1
-    }
-]
+# Define a sample wine input (Make sure these match `feature_names.csv`)
+sample_data = {
+    "fixed_acidity": 6.2,
+    "volatile_acidity": 0.73,
+    "citric_acid": 0.03,
+    "residual_sugar": 1.6,
+    "chlorides": 0.0755,
+    "free_sulfur_dioxide": 5,
+    "total_sulfur_dioxide": 12,
+    "density": 0.0946,
+    "pH": 3.65,
+    "sulphates": 0.69,
+    "alcohol": 9.25,
+    "color": 1  # Assuming 1 = red, 0 = white 
+}
 
-# Send the POST request
-response = requests.post(url, json=sample_data)
+# Send request
+response = requests.post(url, headers={"Content-Type": "application/json"}, data=json.dumps(sample_data))
 
-# Print the response
+# Print response
 print("Status Code:", response.status_code)
 print("Response JSON:", response.json())

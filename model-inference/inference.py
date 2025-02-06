@@ -9,29 +9,39 @@ app = Flask(__name__)
 model_path = "model-training/optimized_rf_model.pkl"
 model = joblib.load(model_path)
 
-# Load feature names from the CSV
+# Load feature names
 feature_names_path = "data/feature_names.csv"
 feature_names = pd.read_csv(feature_names_path)["feature_name"].tolist()
 
-@app.route("/predict", methods=["POST"])
+# Define quality mapping
+quality_map = {
+    1: "1 (Very Poor)", 2: "2 (Poor)", 3: "3 (Average)",
+    4: "4 (Good)", 5: "5 (Excellent)"
+}
+
+@app.route("/predict-wine-quality", methods=["POST"])
 def predict():
     """
-    Predict wine quality using the trained model.
+    Predict wine quality based on user input.
     """
     try:
-        # Parse the input JSON data
+        # Get JSON data from request
         input_data = request.get_json()
 
-        # Convert JSON to DataFrame using the feature names
-        input_df = pd.DataFrame(input_data, columns=feature_names)
+        # Convert JSON to DataFrame using feature names
+        input_df = pd.DataFrame([input_data], columns=feature_names)
+
+        # Make prediction
+        prediction = model.predict(input_df)[0]  # Extract first prediction
         
-        # Make predictions
-        predictions = model.predict(input_df).tolist()
-        
+        # Convert numeric prediction to readable text
+        quality_label = quality_map.get(prediction, f"{prediction} (Unknown)")
+
         return jsonify({
             "message": "Prediction successful",
-            "predictions": predictions
+            "predicted_quality": quality_label
         })
+
     except Exception as e:
         return jsonify({
             "message": "Prediction failed",
