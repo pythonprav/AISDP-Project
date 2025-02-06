@@ -1,42 +1,22 @@
-# Web Application Dockerfile
-# Use an official Python runtime as the base image
-FROM python:3.9-slim
+# Use an official Python runtime as a parent image
+FROM python:3.9
 
-# Set the working directory in the container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the requirements file to the container
-COPY requirements.txt .
+# Copy application files into the container
+COPY . .
 
-# Install dependencies
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application code and static files to the container
-COPY app.py .
-COPY templates/ ./templates/
-COPY static/ ./static/
+# Expose port 5000 (Flask default)
+EXPOSE 5000
 
-# Expose the port for the web app
-EXPOSE 5003
+# Set environment variables for Flask
+ENV FLASK_APP=winequality_app.py
+ENV FLASK_RUN_HOST=0.0.0.0
+ENV MODEL_FILE_PATH=/app/my_wine_model.joblib  # Pass the model file path
 
-# Define the command to run the web application
-CMD ["python", "app.py"]
-
-
-
-# version: '3'
-# services:
-#   model-service:
-#     build: ./model_service
-#     container_name: model-service
-#     ports:
-#       - "5001:5001"
-
-#   flask-app:
-#     build: ./flask_app
-#     container_name: flask-app
-#     ports:
-#       - "5000:5000"
-#     depends_on:
-#       - model-service
-
+# Command to run the Flask app
+CMD ["flask", "run", "--host=0.0.0.0"]
