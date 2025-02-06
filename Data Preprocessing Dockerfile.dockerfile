@@ -7,6 +7,7 @@ WORKDIR /app
 
 # Copy the requirements file to the container
 COPY requirements.txt .
+COPY wine_quality_assignment.csv .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
