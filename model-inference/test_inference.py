@@ -17,7 +17,7 @@ sample_data = {
     "pH": 3.65,
     "sulphates": 0.69,
     "alcohol": 9.25,
-    "color": 1  # Assuming 1 = red, 0 = white 
+    "color": 1  
 }
 
 # Send request
