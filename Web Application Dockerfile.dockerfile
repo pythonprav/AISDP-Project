@@ -10,13 +10,17 @@ COPY . .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port 5000 (Flask default)
-EXPOSE 5000
+# Create necessary directories (ensures volume paths exist)
+RUN mkdir -p /app/uploads /app/models
 
-# Set environment variables for Flask
+# Expose port 5000 for Flask
+EXPOSE 5003
+
+# Set environment variables for Flask and model storage
 ENV FLASK_APP=winequality_app.py
 ENV FLASK_RUN_HOST=0.0.0.0
-ENV MODEL_FILE_PATH=/app/my_wine_model.joblib  # Pass the model file path
+ENV MODEL_PATH=/app/models/optimized_rf_model.pkl
+ENV UPLOAD_FOLDER=/app/uploads
 
-# Command to run the Flask app
+# Command to run the Flask application
 CMD ["flask", "run", "--host=0.0.0.0"]
