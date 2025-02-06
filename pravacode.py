@@ -184,4 +184,4 @@ def main(filepath):
 
 
 if __name__ == "__main__":
-    main('C:\\Users\\zipen\\OneDrive\\Documents\\GitHub\\AISDP-Project\\Data\\]wine_quality_assignment.csv')
+    main('C:\\Users\\zipen\\OneDrive\\Documents\\GitHub\\AISDP-Project\\Data\\wine_quality_assignment.csv')
