@@ -19,7 +19,31 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: /mnt/AISDP-Project/shared-storage  
+    path: /mnt/AISDP-Project/data
+  persistentVolumeReclaimPolicy: Retain
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: model-pvc  
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: model-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /mnt/AISDP-Project/data
   persistentVolumeReclaimPolicy: Retain
 
 

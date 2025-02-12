@@ -8,7 +8,7 @@ WORKDIR /app
 
 # Copy the application code to the container
 COPY Model-Training/train_model.py ./Model-Training/
-# COPY Data/wine_quality_assignment.csv ./Data/
+COPY data/wine_quality_assignment.csv ./data/
 RUN mkdir -p /app/data /app/logs /app/outputs
 
 
@@ -20,7 +20,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Set environment variables for rollback and flexibility
 ENV ROLLBACK_ENABLED=true
-ENV TRAINING_FILE_PATH="./Data/wine_quality_assignment.csv"
+ENV TRAINING_FILE_PATH="./data/wine_quality_assignment.csv"
 ENV PYTHONUNBUFFERED=1
 ENV LOG_LEVEL=DEBUG
 

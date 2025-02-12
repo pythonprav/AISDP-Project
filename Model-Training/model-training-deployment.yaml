@@ -28,7 +28,7 @@ spec:
         - name: ROLLBACK_ENABLED
           value: "true"  # Enable rollback for safer deployments
         - name: TRAINING_FILE_PATH
-          value: "/app/Data/wine_quality_assignment.csv"  # Path to the training data
+          value: "/app/data/wine_quality_assignment.csv"  # Path to the training data
         - name: LOG_LEVEL
           value: "DEBUG"  # Set log verbosity
         envFrom:
@@ -59,7 +59,7 @@ spec:
             cpu: "1"
         volumeMounts:
         - name: data-volume
-          mountPath: /app/Data  # Mount the data directory into the container
+          mountPath: /app/data  # Mount the data directory into the container
         - name: model-volume
           mountPath: /app/models  # Mount the models directory into the container
       volumes:

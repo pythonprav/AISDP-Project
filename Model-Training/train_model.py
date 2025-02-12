@@ -10,7 +10,7 @@ import logging
 
 # Load environment variables
 # TRAINING_FILE_PATH = os.getenv("TRAINING_FILE_PATH", "../Data/wine_quality_assignment.csv")
-TRAINING_FILE_PATH = os.getenv("TRAINING_FILE_PATH", "/app/Data/wine_quality_assignment.csv")
+TRAINING_FILE_PATH = os.getenv("TRAINING_FILE_PATH", "/app/data/wine_quality_assignment.csv")
 
 # SAVED_MODEL_DIR = os.getenv("SAVED_MODEL_PATH", "./saved_model")
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
