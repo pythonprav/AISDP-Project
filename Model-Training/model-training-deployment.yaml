@@ -34,8 +34,8 @@ spec:
         envFrom:
         - configMapRef:
             name: model-training-config  # Includes TRAINING_FILE_PATH, LOG_LEVEL, etc.
-        - secretRef:
-            name: github-token            
+        # - secretRef:
+        #     name: github-token            
         # - secretRef:
         #     name: docker-credentials  # Includes DOCKER_USERNAME, DOCKER_PASSWORD
         readinessProbe:
@@ -70,4 +70,3 @@ spec:
         persistentVolumeClaim:
           claimName: model-pvc  # Persistent Volume Claim for models
 
-restartPolicy: Always
