@@ -9,8 +9,10 @@ import os
 import logging
 
 # Load environment variables
-TRAINING_FILE_PATH = os.getenv("TRAINING_FILE_PATH", "../Data/wine_quality_assignment.csv")
-SAVED_MODEL_DIR = os.getenv("SAVED_MODEL_PATH", "./saved_model")
+# TRAINING_FILE_PATH = os.getenv("TRAINING_FILE_PATH", "../Data/wine_quality_assignment.csv")
+TRAINING_FILE_PATH = os.getenv("TRAINING_FILE_PATH", "/app/Data/wine_quality_assignment.csv")
+
+# SAVED_MODEL_DIR = os.getenv("SAVED_MODEL_PATH", "./saved_model")
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
 # Load RandomForest parameters from environment variables
@@ -149,7 +151,8 @@ def train_model():
     global current_metrics, current_model
     try:
         # Update the default filepath to match the relative path in your project
-        data_path = request.json.get('filepath','../Data/wine_quality_assignment.csv')
+        # data_path = request.json.get('filepath','../Data/wine_quality_assignment.csv')
+        data_path = os.getenv("TRAINING_FILE_PATH", "/app/data/wine_quality_assignment.csv")
         wine = load_and_clean_data(data_path)
         wine = preprocess_quality(wine)
         X_train, X_val, X_test, y_train, y_val, y_test = split_data(wine)
@@ -189,8 +192,9 @@ def retrain_model():
     return train_model()
 
 import os
-# Define the path to the saved_model folder
-SAVED_MODEL_DIR = os.path.join(os.getcwd(), "saved_model")
+SAVED_MODEL_DIR = "/app/models"
+# # Define the path to the saved_model folder
+# SAVED_MODEL_DIR = os.path.join(os.getcwd(), "saved_model")
 
 @app.route('/save-model', methods=['POST'])
 def save_model():
@@ -200,7 +204,7 @@ def save_model():
         if current_model:
             # Create the saved_model folder if it doesn't exist
             os.makedirs(SAVED_MODEL_DIR, exist_ok=True)
-            model_path = os.path.join(SAVED_MODEL_DIR, "model.pkl")
+            model_path = os.path.join(SAVED_MODEL_DIR, "saved_model.pkl")
             joblib.dump(current_model, model_path)
             post_message(f"Model saved successfully at {model_path}.")
             return jsonify({"message": f"Model saved successfully at {model_path}!"})

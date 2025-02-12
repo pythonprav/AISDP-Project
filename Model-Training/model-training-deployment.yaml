@@ -24,9 +24,6 @@ spec:
         image: pravallikadocker123/model-training:latest
         ports:
         - containerPort: 5001
-        volumeMounts:
-        - name: data-volume
-          mountPath: /app/Data  # Mount the data directory into the container
         env:
         - name: ROLLBACK_ENABLED
           value: "true"  # Enable rollback for safer deployments
@@ -39,11 +36,11 @@ spec:
             name: model-training-config  # Includes TRAINING_FILE_PATH, LOG_LEVEL, etc.
         - secretRef:
             name: github-token            
-        - secretRef:
-            name: docker-credentials  # Includes DOCKER_USERNAME, DOCKER_PASSWORD
+        # - secretRef:
+        #     name: docker-credentials  # Includes DOCKER_USERNAME, DOCKER_PASSWORD
         readinessProbe:
           httpGet:
-            path: /train
+            path: /health
             port: 5001
           initialDelaySeconds: 5
           periodSeconds: 10
@@ -62,11 +59,15 @@ spec:
             cpu: "1"
         volumeMounts:
         - name: data-volume
-          mountPath: /app/Data
+          mountPath: /app/Data  # Mount the data directory into the container
+        - name: model-volume
+          mountPath: /app/models  # Mount the models directory into the container
       volumes:
       - name: data-volume
         persistentVolumeClaim:
-          claimName: data-pvc  # Dynamic volume provisioning
+          claimName: data-pvc  # Persistent Volume Claim for data
+      - name: model-volume
+        persistentVolumeClaim:
+          claimName: model-pvc  # Persistent Volume Claim for models
 
-
-
+restartPolicy: Always

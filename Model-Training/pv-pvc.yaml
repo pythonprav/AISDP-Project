@@ -1,23 +1,49 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data-pvc  
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+---
 kind: PersistentVolume
 apiVersion: v1
 metadata:
   name: data-pv
 spec:
   capacity:
-    storage: 1Gi
+    storage: 5Gi
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   hostPath:
-    path: /mnt/AISDP-Project/Data
+    path: /mnt/AISDP-Project/shared-storage  
   persistentVolumeReclaimPolicy: Retain
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: data-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
+
+
+
+# kind: PersistentVolume
+# apiVersion: v1
+# metadata:
+#   name: data-pv
+# spec:
+#   capacity:
+#     storage: 5Gi
+#   accessModes:
+#     - ReadWriteMany
+#   hostPath:
+#     path: /mnt/AISDP-Project/Data
+#   persistentVolumeReclaimPolicy: Retain
+# ---
+# kind: PersistentVolumeClaim
+# apiVersion: v1
+# metadata:
+#   name: data-pvc
+# spec:
+#   accessModes:
+#     - ReadWriteMany
+#   resources:
+#     requests:
+#       storage: 5Gi

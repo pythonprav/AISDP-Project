@@ -82,4 +82,4 @@ def test_save_model_endpoint():
 
 if __name__ == "__main__":
     # Run the tests
-    pytest.main(["-v", "tests/test_train_model.py"])
+    pytest.main(["-v", "Model-Training/test_train_model.py"])

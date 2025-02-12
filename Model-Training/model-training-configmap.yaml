@@ -4,8 +4,8 @@ metadata:
   name: model-training-config
   namespace: default
 data:
-  TRAINING_FILE_PATH: "/app/Data/wine_quality_assignment.csv"
-  SAVED_MODEL_PATH: "/app/saved_model"
+  TRAINING_FILE_PATH: "/app/data/wine_quality_assignment.csv"
+  SAVED_MODEL_PATH: "/app/saved_model.pkl"
   LOG_LEVEL: "DEBUG"
   RANDOM_FOREST_N_ESTIMATORS: "100"  # Number of trees in the forest
   RANDOM_FOREST_MAX_DEPTH: "20"  # Maximum depth of each tree

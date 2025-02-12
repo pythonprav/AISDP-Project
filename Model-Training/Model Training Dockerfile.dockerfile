@@ -8,7 +8,9 @@ WORKDIR /app
 
 # Copy the application code to the container
 COPY Model-Training/train_model.py ./Model-Training/
-COPY Data/wine_quality_assignment.csv ./Data/
+# COPY Data/wine_quality_assignment.csv ./Data/
+RUN mkdir -p /app/data /app/logs /app/outputs
+
 
 # Copy the requirements file to the container
 COPY Model-Training/requirements.txt .
