@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: model-training
-        image: pravallikadocker123/model-training:latest
+        image: pravallikadocker123/model-training:v3
         ports:
         - containerPort: 5001
         env:
@@ -65,7 +65,7 @@ spec:
       volumes:
       - name: data-volume
         persistentVolumeClaim:
-          claimName: data-pvc  # Persistent Volume Claim for data
+          claimName: dataset-pvc  # Persistent Volume Claim for data
       - name: model-volume
         persistentVolumeClaim:
           claimName: model-pvc  # Persistent Volume Claim for models
