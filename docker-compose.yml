@@ -9,7 +9,6 @@ services:
     volumes:
       - userinputs:/mnt/userinputs
       - data:/mnt/data
-      - models:/mnt/models
     depends_on:
       - model-training  # Ensure the model is trained before accepting input
     networks:
