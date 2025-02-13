@@ -1,75 +1,80 @@
-from flask import Flask, render_template, request, redirect, url_for
+import os
+from flask import Flask, render_template, request
 import pandas as pd
-import joblib  
+import time
+
+# Define paths to Persistent Volumes (PVs)
+USER_INPUTS_DIR = "/mnt/userinputs"  # Path where Web App saves user data
+MODEL_OUTPUTS_DIR = "/mnt/data"  # Path where Model Inference saves predictions
+
+# Ensure directories exist
+os.makedirs(USER_INPUTS_DIR, exist_ok=True)
+os.makedirs(MODEL_OUTPUTS_DIR, exist_ok=True)
 
 app = Flask(__name__)
 
-# (Optional) Load your pre-trained model at startup
-model = joblib.load("my_wine_model.joblib")
-
 @app.route("/")
 def index():
-    # Render the home page (index.html)
+    """Render the home page (index.html)."""
     return render_template("index.html")
 
 @app.route("/model_pred_csv", methods=["GET", "POST"])
 def model_pred_csv():
     if request.method == "POST":
-        # The user uploaded a CSV, handle it:
+        # Save CSV to `userinputs` PV for processing
         csv_file = request.files["csvFile"]
         if csv_file:
-            df = pd.read_csv(csv_file)  # read CSV as DataFrame
-            # Predict with your model (assuming it expects columns consistent with your dataset)
-            predictions = model.predict(df.drop("quality", axis=1, errors="ignore"))
+            file_path = os.path.join(USER_INPUTS_DIR, "input.csv")
+            csv_file.save(file_path)
             
-            # Or do some logic to combine predictions with the DataFrame
-            df["prediction"] = predictions
+            # Wait for the processed result from Model Inference
+            output_file = os.path.join(MODEL_OUTPUTS_DIR, "predictions.csv")
+            for _ in range(10):  # Wait for max ~10s
+                if os.path.exists(output_file):
+                    df = pd.read_csv(output_file)
+                    return render_template("model_pred_csv.html", tables=df.to_html())
+                time.sleep(1)
             
-            # Return the same page but with results:
-            return render_template("model_pred_csv.html", tables=df.to_html())
-    # If GET, just show the form
+            return "Processing took too long. Try again later."
+
     return render_template("model_pred_csv.html")
 
 @app.route("/model_pred_manual", methods=["GET", "POST"])
 def model_pred_manual():
     if request.method == "POST":
-        fixed_acidity = float(request.form.get("fixed_acidity"))
-        volatile_acidity = float(request.form.get("volatile_acidity"))
-        citric_acid = float(request.form.get("citric_acid"))
-        residual_sugar = float(request.form.get("residual_sugar"))
-        chlorides = float(request.form.get("chlorides"))
-        free_sulfur_dioxide = float(request.form.get("free_sulfur_dioxide"))
-        total_sulfur_dioxide = float(request.form.get("total_sulfur_dioxide"))
-        density = float(request.form.get("density"))
-        pH = float(request.form.get("pH"))  # Include pH
-        sulphates = float(request.form.get("sulphates"))
-        alcohol = float(request.form.get("alcohol"))
-        color = request.form.get("color")  # "red" or "white"
+        # Collect input values from the form
+        data = {
+            "fixed_acidity": float(request.form.get("fixed_acidity")),
+            "volatile_acidity": float(request.form.get("volatile_acidity")),
+            "citric_acid": float(request.form.get("citric_acid")),
+            "residual_sugar": float(request.form.get("residual_sugar")),
+            "chlorides": float(request.form.get("chlorides")),
+            "free_sulfur_dioxide": float(request.form.get("free_sulfur_dioxide")),
+            "total_sulfur_dioxide": float(request.form.get("total_sulfur_dioxide")),
+            "density": float(request.form.get("density")),
+            "pH": float(request.form.get("pH")),
+            "sulphates": float(request.form.get("sulphates")),
+            "alcohol": float(request.form.get("alcohol")),
+            "color": request.form.get("color")
+        }
 
-        # Put features in a single DataFrame row
-        feature_df = pd.DataFrame([{
-            "fixed_acidity": fixed_acidity,
-            "volatile_acidity": volatile_acidity,
-            "citric_acid": citric_acid,
-            "residual_sugar": residual_sugar,
-            "chlorides": chlorides,
-            "free_sulfur_dioxide": free_sulfur_dioxide,
-            "total_sulfur_dioxide": total_sulfur_dioxide,
-            "density": density,
-            "pH": pH,
-            "sulphates": sulphates,
-            "alcohol": alcohol,
-            "color": color  # might need encoding if your model expects numeric
-        }])
-        
-        # Predict
-        prediction = model.predict(feature_df)[0]
-        
-        # Return the same page but show the prediction
-        return render_template("model_pred_manual.html", prediction=prediction)
+        # Convert data to DataFrame and save to `userinputs` PV
+        df = pd.DataFrame([data])
+        input_file = os.path.join(USER_INPUTS_DIR, "input.csv")
+        df.to_csv(input_file, index=False)
 
-    # If GET, just show the form
+        # Wait for the processed result from Model Inference
+        output_file = os.path.join(MODEL_OUTPUTS_DIR, "predictions.csv")
+        for _ in range(10):  # Wait for max ~10s
+            if os.path.exists(output_file):
+                with open(output_file, "r") as f:
+                    prediction = f.read().strip()
+                return render_template("model_pred_manual.html", prediction=prediction)
+            time.sleep(1)
+
+        return "Processing took too long. Try again later."
+
     return render_template("model_pred_manual.html")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
