@@ -8,19 +8,24 @@ import json
 import os
 import logging
 
+DATA_DIR = "/mnt/data/"
+MODELS_DIR = "/mnt/models/"
+
 # Load environment variables
 # TRAINING_FILE_PATH = os.getenv("TRAINING_FILE_PATH", "../Data/wine_quality_assignment.csv")
-TRAINING_FILE_PATH = os.getenv("TRAINING_FILE_PATH", "/app/data/wine_quality_assignment.csv")
+# TRAINING_FILE_PATH = os.getenv("TRAINING_FILE_PATH", "/app/data/wine_quality_assignment.csv")
+TRAINING_FILE_PATH = os.getenv("TRAINING_FILE_PATH", "/mnt/data/clean_wine_quality.csv")
+
 
 # SAVED_MODEL_DIR = os.getenv("SAVED_MODEL_PATH", "./saved_model")
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
-# Load RandomForest parameters from environment variables
-RF_N_ESTIMATORS = int(os.getenv("RANDOM_FOREST_N_ESTIMATORS", "100"))
-RF_MAX_DEPTH = int(os.getenv("RANDOM_FOREST_MAX_DEPTH", "20")) if os.getenv("RANDOM_FOREST_MAX_DEPTH") != "None" else None
-RF_MIN_SAMPLES_SPLIT = int(os.getenv("RANDOM_FOREST_MIN_SAMPLES_SPLIT", "2"))
-RF_MIN_SAMPLES_LEAF = int(os.getenv("RANDOM_FOREST_MIN_SAMPLES_LEAF", "1"))
-RF_MAX_FEATURES = os.getenv("RANDOM_FOREST_MAX_FEATURES", "sqrt")
+# # Load RandomForest parameters from environment variables
+# RF_N_ESTIMATORS = int(os.getenv("RANDOM_FOREST_N_ESTIMATORS", "100"))
+# RF_MAX_DEPTH = int(os.getenv("RANDOM_FOREST_MAX_DEPTH", "20")) if os.getenv("RANDOM_FOREST_MAX_DEPTH") != "None" else None
+# RF_MIN_SAMPLES_SPLIT = int(os.getenv("RANDOM_FOREST_MIN_SAMPLES_SPLIT", "2"))
+# RF_MIN_SAMPLES_LEAF = int(os.getenv("RANDOM_FOREST_MIN_SAMPLES_LEAF", "1"))
+# RF_MAX_FEATURES = os.getenv("RANDOM_FOREST_MAX_FEATURES", "sqrt")
 
 # Update logging level
 logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -41,7 +46,7 @@ def post_message(message):
     logging.info(message)
 
 
-def load_and_clean_data(filepath):
+def load_clean_data(filepath):
     """Load and clean the dataset."""
     try:
         post_message("Loading and Cleaning Data...")
@@ -50,14 +55,14 @@ def load_and_clean_data(filepath):
             raise FileNotFoundError(f"File not found: {filepath}")
         
         wine = pd.read_csv(filepath)  # Use filepath passed from the function
-        wine.drop(['Sample'], axis=1, inplace=True)
-        wine.dropna(inplace=True)
-        wine.drop_duplicates(inplace=True)
-        wine = wine[wine['quality'] != 2]  # Remove rows with quality '2'
-        wine.reset_index(drop=True, inplace=True)
+        # wine.drop(['Sample'], axis=1, inplace=True)
+        # wine.dropna(inplace=True)
+        # wine.drop_duplicates(inplace=True)
+        # wine = wine[wine['quality'] != 2]  # Remove rows with quality '2'
+        # wine.reset_index(drop=True, inplace=True)
         
-        # Binary encoding for 'color' column
-        wine['color'] = wine['color'].apply(lambda x: 1 if x.lower() == 'red' else 0)
+        # # Binary encoding for 'color' column
+        # wine['color'] = wine['color'].apply(lambda x: 1 if x.lower() == 'red' else 0)
         
         post_message("Data Loaded and Cleaned Successfully.")
         return wine
@@ -65,23 +70,23 @@ def load_and_clean_data(filepath):
         logging.error(f"Error loading and cleaning data: {e}")
         raise
 
-def preprocess_quality(wine):
-    """Preprocess quality column into categorical labels."""
-    try:
-        post_message("Preprocessing Quality Labels...")
-        quality_map = {
-            1: '1 Star', 2: '1 Star',
-            3: '2 Star', 4: '2 Star',
-            5: '3 Star', 6: '3 Star',
-            7: '4 Star', 8: '4 Star',
-            9: '5 Star', 10: '5 Star'
-        }
-        wine['quality'] = wine['quality'].map(quality_map)
-        post_message("Quality Labels Preprocessed.")
-        return wine
-    except Exception as e:
-        logging.error(f"Error preprocessing quality labels: {e}")
-        raise
+# def preprocess_quality(wine):
+#     """Preprocess quality column into categorical labels."""
+#     try:
+#         post_message("Preprocessing Quality Labels...")
+#         quality_map = {
+#             1: '1 Star', 2: '1 Star',
+#             3: '2 Star', 4: '2 Star',
+#             5: '3 Star', 6: '3 Star',
+#             7: '4 Star', 8: '4 Star',
+#             9: '5 Star', 10: '5 Star'
+#         }
+#         wine['quality'] = wine['quality'].map(quality_map)
+#         post_message("Quality Labels Preprocessed.")
+#         return wine
+#     except Exception as e:
+#         logging.error(f"Error preprocessing quality labels: {e}")
+#         raise
 
 
 def split_data(wine):
@@ -117,13 +122,22 @@ def optimize_random_forest(X_train, y_train):
             n_jobs=-1
         )
         
-        # Define the hyperparameter grid
+        # # Define the hyperparameter grid
+        # param_grid = {
+        #     'n_estimators': [RF_N_ESTIMATORS, RF_N_ESTIMATORS + 50],
+        #     'max_depth': [RF_MAX_DEPTH, None],
+        #     'min_samples_split': [RF_MIN_SAMPLES_SPLIT, RF_MIN_SAMPLES_SPLIT + 2],
+        #     'min_samples_leaf': [RF_MIN_SAMPLES_LEAF, RF_MIN_SAMPLES_LEAF + 1],
+        #     'max_features': [RF_MAX_FEATURES, 'log2']
+        # }
+
+        # Define the hyperparameter grid with hardcoded values
         param_grid = {
-            'n_estimators': [RF_N_ESTIMATORS, RF_N_ESTIMATORS + 50],
-            'max_depth': [RF_MAX_DEPTH, None],
-            'min_samples_split': [RF_MIN_SAMPLES_SPLIT, RF_MIN_SAMPLES_SPLIT + 2],
-            'min_samples_leaf': [RF_MIN_SAMPLES_LEAF, RF_MIN_SAMPLES_LEAF + 1],
-            'max_features': [RF_MAX_FEATURES, 'log2']
+            'n_estimators': [100, 150],       # Number of trees in the forest
+            'max_depth': [20, None],          # Maximum depth of each tree
+            'min_samples_split': [2, 4],      # Minimum samples required to split an internal node
+            'min_samples_leaf': [1, 2],       # Minimum samples required to be at a leaf node
+            'max_features': ['sqrt', 'log2']  # Number of features to consider for the best split
         }
         
         # Perform GridSearchCV
@@ -152,9 +166,10 @@ def train_model():
     try:
         # Update the default filepath to match the relative path in your project
         # data_path = request.json.get('filepath','../Data/wine_quality_assignment.csv')
-        data_path = os.getenv("TRAINING_FILE_PATH", "/app/data/wine_quality_assignment.csv")
-        wine = load_and_clean_data(data_path)
-        wine = preprocess_quality(wine)
+        # data_path = os.getenv("TRAINING_FILE_PATH", "/app/data/wine_quality_assignment.csv")
+        data_path = os.getenv("/mnt/data/clean_wine_quality.csv")
+        wine = load_clean_data(data_path)
+        # wine = preprocess_quality(wine)
         X_train, X_val, X_test, y_train, y_val, y_test = split_data(wine)
 
         # Train and optimize the model
@@ -191,10 +206,13 @@ def retrain_model():
     """Retrain the model."""
     return train_model()
 
-import os
-SAVED_MODEL_DIR = "/app/models"
+
+SAVED_MODEL_DIR = "/mnt/models/"
 # # Define the path to the saved_model folder
 # SAVED_MODEL_DIR = os.path.join(os.getcwd(), "saved_model")
+# joblib.dump(rf, "/mnt/models/saved_model.pkl")
+post_message("Model saved successfully at /mnt/models/saved_model.pkl")
+
 
 @app.route('/save-model', methods=['POST'])
 def save_model():
@@ -205,7 +223,9 @@ def save_model():
             # Create the saved_model folder if it doesn't exist
             os.makedirs(SAVED_MODEL_DIR, exist_ok=True)
             model_path = os.path.join(SAVED_MODEL_DIR, "saved_model.pkl")
-            joblib.dump(current_model, model_path)
+            joblib.dump(current_model, "/mnt/models/saved_model.pkl")
+            post_message("Model saved successfully at /mnt/models/saved_model.pkl")
+            # joblib.dump(current_model, model_path)
             post_message(f"Model saved successfully at {model_path}.")
             return jsonify({"message": f"Model saved successfully at {model_path}!"})
         else:

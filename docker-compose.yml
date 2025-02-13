@@ -35,7 +35,7 @@ services:
       - models:/mnt/models
     networks:
       - app_network
-    command: ["python", "/app/train.py"]  # Automatically run model training on startup
+    command: ["python", "./Model-Training/train_model.py"]  # Automatically run model training on startup
 
   model-inference:
     build: ./model-inference
