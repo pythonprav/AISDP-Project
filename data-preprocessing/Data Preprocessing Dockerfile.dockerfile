@@ -2,20 +2,20 @@
 # Use an official Python runtime as the base image
 FROM python:3.9-slim
 
-# Set the working directory in the container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the requirements file to the container
-COPY ../requirements.txt .
+# Copy the entire data-preprocessing folder (including data and scripts)
+COPY . /app/
+
+# Ensure the 'data' directory exists
+RUN mkdir -p /app/data
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application code to the container
-COPY preprocess.py .
-
-# Expose the port the app runs on
+# Expose the Flask app port
 EXPOSE 5000
 
-# Define the command to run the application
+# Run the preprocessing application
 CMD ["python", "preprocess.py"]
