@@ -3,23 +3,26 @@ kind: Deployment
 metadata:
   name: wine-quality-inference
   labels:
-    app: wine-quality
+    app: wine-quality-inference
 spec:
-  replicas: 2
+  replicas: 2  
   selector:
     matchLabels:
-      app: wine-quality
+      app: wine-quality-inference
   template:
     metadata:
       labels:
-        app: wine-quality
+        app: wine-quality-inference
     spec:
       containers:
-        - name: inference-container
+        - name: wine-quality-inference
           image: wine-quality-inference:latest
           ports:
             - containerPort: 5000
-          resources:
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
+          volumeMounts:
+            - name: model-volume
+              mountPath: /app/model-training
+      volumes:
+        - name: model-volume
+          hostPath:
+            path: /Users/pariikubavat/Documents/GitHub/AISDP-Project/AISDP/model-training
