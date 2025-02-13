@@ -4,6 +4,3 @@ Flask
 scikit-learn
 joblib
 pytest
-
-
-

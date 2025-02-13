@@ -1,23 +1,21 @@
-# Use an official Python runtime as the base image
+# Base Image
 FROM python:3.9-slim
 
-# Set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy the entire data-preprocessing folder (including data and scripts)
-COPY . /app/
-
-# Ensure the 'data' directory exists
-RUN mkdir -p /app/data
-
-# Install dependencies
+# Copy requirements and install dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose the Flask app port
-EXPOSE 5000
+# Copy the entire preprocessing folder
+COPY . .
 
-# Copy the dataset into the container
-COPY raw_data /app/raw_data
+# Ensure volumes/data directory exists
+RUN mkdir -p /app/volumes/data /app/volumes/user
+
+# Expose Flask port
+EXPOSE 5000
 
 # Run the preprocessing application
 CMD ["python", "preprocess.py"]
