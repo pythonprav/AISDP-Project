@@ -21,7 +21,3 @@ services:
 secrets:
   GITHUB_TOKEN:
     external: true
-  DOCKER_USERNAME:
-    external: true
-  DOCKER_PASSWORD:
-    external: true

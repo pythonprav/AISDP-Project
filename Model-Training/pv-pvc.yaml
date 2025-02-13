@@ -12,7 +12,7 @@ spec:
 kind: PersistentVolume
 apiVersion: v1
 metadata:
-  name: data-pv
+  name: dataset-pv
 spec:
   capacity:
     storage: 5Gi
@@ -44,6 +44,30 @@ spec:
     - ReadWriteMany
   hostPath:
     path: /mnt/AISDP-Project/model
+  persistentVolumeReclaimPolicy: Retain
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: userinput-pvc  
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: userinput-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /mnt/AISDP-Project/userinput
   persistentVolumeReclaimPolicy: Retain
 
 # kind: PersistentVolume
