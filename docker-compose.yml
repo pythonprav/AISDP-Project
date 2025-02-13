@@ -1,0 +1,59 @@
+version: "3.9"
+
+services:
+  webapp:
+    build: ./webapp
+    container_name: webapp
+    ports:
+      - "5003:5003"  # Only expose web app externally
+    volumes:
+      - userinputs:/mnt/userinputs
+      - data:/mnt/data
+      - models:/mnt/models
+    depends_on:
+      - model-training  # Ensure the model is trained before accepting input
+    networks:
+      - app_network
+
+  data-preprocessing:
+    build: ./data-preprocessing
+    container_name: data-preprocessing
+    expose:
+      - "5000"
+    volumes:
+      - userinputs:/mnt/userinputs
+      - data:/mnt/data
+    networks:
+      - app_network
+
+  model-training:
+    build: ./model-training
+    container_name: model-training
+    expose:
+      - "5001"
+    volumes:
+      - data:/mnt/data
+      - models:/mnt/models
+    networks:
+      - app_network
+    command: ["python", "/app/train.py"]  # Automatically run model training on startup
+
+  model-inference:
+    build: ./model-inference
+    container_name: model-inference
+    expose:
+      - "5002"
+    volumes:
+      - data:/mnt/data
+      - models:/mnt/models
+    networks:
+      - app_network
+
+volumes:
+  userinputs:
+  data:
+  models:
+
+networks:
+  app_network:
+    driver: bridge
