@@ -7,7 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 
 app = Flask(__name__)
 
-DATA_FOLDER = "data-preprocessing/data"
+DATA_FOLDER = "raw data"
 
 def convert_csv_to_json():
     """
