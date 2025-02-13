@@ -43,10 +43,8 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: /mnt/AISDP-Project/data
+    path: /mnt/AISDP-Project/model
   persistentVolumeReclaimPolicy: Retain
-
-
 
 # kind: PersistentVolume
 # apiVersion: v1
