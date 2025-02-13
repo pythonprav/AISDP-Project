@@ -58,6 +58,7 @@ volumes:
   user:  # 🔹 User input for predictions
   data:  # 🔹 Processed data storage
   models:  # 🔹 Trained models
+  raw_data: /raw_data
 
 networks:
   app_network:
