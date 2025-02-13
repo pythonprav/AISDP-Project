@@ -9,6 +9,7 @@ app = Flask(__name__)
 
 DATA_FOLDER = "volumes/data"
 USER_INPUTS_DIR = "/mnt/user"
+
 def convert_csv_to_json():
     """
     Converts wine_quality_assignment.csv to JSON and saves it in the data folder.
@@ -73,17 +74,17 @@ def preprocess_data():
     Flask route to preprocess JSON data.
     """
     try:
-        # Step 1: Read the JSON file
+        # Read the JSON file
         with open(json_file_path, "r") as file:
             data = json.load(file)
 
-        # Step 2: Convert JSON data to DataFrame
+        # Convert JSON data to DataFrame
         df = pd.DataFrame(data)
 
-        # Step 3: Apply preprocessing logic
+        # Apply preprocessing logic
         df = preprocess_data_logic(df)
 
-        # Step 4: Save the cleaned dataset to CSV
+        # Save the cleaned dataset to CSV
         cleaned_csv = os.path.join(DATA_FOLDER, "cleaned_wine_quality.csv")
         df.to_csv(cleaned_csv, index=False)
 
@@ -115,7 +116,6 @@ def process_user_input():
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
