@@ -5,7 +5,7 @@ import json
 url = "http://127.0.0.1:5000/get-data"
 
 # Path to your JSON file
-json_file_path = "data-preprocessing/Data/wine_quality.json"
+json_file_path = "data/wine_quality.json"
 
 # Read the JSON data
 with open(json_file_path, "r") as file:
