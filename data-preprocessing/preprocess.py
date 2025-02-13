@@ -21,13 +21,13 @@ def convert_csv_to_json():
 
     # Check if CSV exists
     if not os.path.exists(csv_file):
-        raise FileNotFoundError(f"❌ CSV file not found at {csv_file}. Ensure it exists in the 'raw_data' folder.")
+        raise FileNotFoundError(f"CSV file not found at {csv_file}. Ensure it exists in the 'raw_data' folder.")
 
     # Read CSV and convert to JSON
     df = pd.read_csv(csv_file)
     df.to_json(json_file, orient='records', indent=4)
 
-    print(f"✅ CSV has been converted to JSON and saved to {json_file}")
+    print(f"CSV has been converted to JSON and saved to {json_file}")
     return json_file  # Return the JSON file path
 
 # Ensure CSV is converted to JSON on startup
@@ -88,7 +88,7 @@ def preprocess_data():
         df.to_csv(cleaned_csv, index=False)
 
         return jsonify({
-            "message": f"✅ CSV converted to JSON at {json_file_path}. Data preprocessed successfully! Cleaned file saved to {cleaned_csv}"
+            "message": f"CSV converted to JSON at {json_file_path}. Data preprocessed successfully! Cleaned file saved to {cleaned_csv}"
         })
     
     except Exception as e:
@@ -102,7 +102,7 @@ def process_user_input():
     try:
         input_file = os.path.join(USER_INPUTS_DIR, "input.csv")
         if not os.path.exists(input_file):
-            return jsonify({"error": "❌ No input file found"}), 400
+            return jsonify({"error": "No input file found"}), 400
 
         df = pd.read_csv(input_file)
         df = preprocess_data_logic(df)
@@ -111,7 +111,7 @@ def process_user_input():
         cleaned_input_file = os.path.join(USER_INPUTS_DIR, "cleaned_input.csv")
         df.to_csv(cleaned_input_file, index=False)
 
-        return jsonify({"message": f"✅ User input processed and saved to {cleaned_input_file}"}), 200
+        return jsonify({"message": f"User input processed and saved to {cleaned_input_file}"}), 200
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
