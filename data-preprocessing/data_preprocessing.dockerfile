@@ -16,5 +16,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Expose the Flask app port
 EXPOSE 5000
 
+# Copy the dataset into the container
+COPY raw_data /app/raw_data
+
 # Run the preprocessing application
 CMD ["python", "preprocess.py"]
