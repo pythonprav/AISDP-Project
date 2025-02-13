@@ -4,11 +4,11 @@ metadata:
   name: data-pv
 spec:
   capacity:
-    storage: 1Gi
+    storage: 2Gi
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: /app/volumes/data
+    path: "/app/volumes/data"
 
 ---
 apiVersion: v1
@@ -20,7 +20,7 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 1Gi
+      storage: 2Gi
 
 ---
 apiVersion: v1
@@ -33,7 +33,7 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: /app/volumes/user
+    path: "/app/volumes/user"
 
 ---
 apiVersion: v1

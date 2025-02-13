@@ -5,7 +5,7 @@ metadata:
   labels:
     app: data-preprocessing
 spec:
-  replicas: 3  # Ensures high availability (scaling)
+  replicas: 3  # Deploy 3 pods for redundancy
   selector:
     matchLabels:
       app: data-preprocessing
@@ -20,38 +20,43 @@ spec:
         app: data-preprocessing
     spec:
       containers:
-        - name: data-preprocessing
-          image: pengpengintotheroom/preprocess:latest  # Update with actual Docker image
-          ports:
-            - containerPort: 5000
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "250m"
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
-          env:
-            - name: FLASK_ENV
-              value: "production"
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 5000
-            initialDelaySeconds: 10
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: 5000
-            initialDelaySeconds: 5
-            periodSeconds: 5
-          imagePullPolicy: Always
-      restartPolicy: Always
+      - name: data-preprocessing
+        image: pengpengintotheroom/preprocess:latest  # Replace if needed
+        ports:
+          - containerPort: 5000
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        env:
+          - name: FLASK_ENV
+            value: "production"
+        volumeMounts:
+          - name: data-volume
+            mountPath: "/app/volumes/data"
+          - name: user-volume
+            mountPath: "/app/volumes/user"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        imagePullPolicy: Always
       volumes:
-        - name: data-volume
-          persistentVolumeClaim:
-            claimName: data-pvc
-        - name: user-volume
-          persistentVolumeClaim:
-            claimName: user-pvc
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: data-pvc
+      - name: user-volume
+        persistentVolumeClaim:
+          claimName: user-pvc
+      restartPolicy: Always
