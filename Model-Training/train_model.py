@@ -223,5 +223,10 @@ def get_metrics():
     return jsonify({"message": "No metrics available!"})
 
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Health check endpoint for Kubernetes"""
+    return jsonify({"status": "ok"}), 200
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001)
