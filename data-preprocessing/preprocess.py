@@ -65,30 +65,44 @@ def preprocess_data_logic(df):
 @app.route('/get-data', methods=['POST'])
 def preprocess_data():
     """
-    Flask route to preprocess incoming JSON data.
+    Flask route to preprocess incoming JSON or CSV data.
     """
     try:
-        # Receive raw data via JSON
-        data = request.get_json()
+        # Ensure the data directory exists
+        data_dir = "data"
+        os.makedirs(data_dir, exist_ok=True)
 
-        # Convert data to DataFrame
-        df = pd.DataFrame(data)
+        # Check if request contains a CSV file
+        if 'file' in request.files:
+            csv_file = request.files['file']
+            df = pd.read_csv(csv_file)  # Read CSV file
+        else:
+            # Assume JSON input if no CSV file is provided
+            data = request.get_json()
+            if not data:
+                return jsonify({"error": "No data received"}), 400
+            df = pd.DataFrame(data)
+
+        # Convert CSV to JSON before preprocessing (if CSV was provided)
+        json_filepath = os.path.join(data_dir, "wine_quality.json")
+        df.to_json(json_filepath, orient="records", indent=4)
 
         # Apply preprocessing logic
         df = preprocess_data_logic(df)
 
-        # Define output directory and ensure it exists
-        output_dir = "data"
-        os.makedirs(output_dir, exist_ok=True)
-        output_filepath = os.path.join(output_dir, "cleaned_wine_quality.csv")
+        # Define output file path
+        cleaned_csv_filepath = os.path.join(data_dir, "cleaned_wine_quality.csv")
 
-        # Save the cleaned data to the Data folder
-        df.to_csv(output_filepath, index=False)
+        # Save the cleaned data
+        df.to_csv(cleaned_csv_filepath, index=False)
 
-        return jsonify({"message": f"Data preprocessed successfully! Cleaned file saved to {output_filepath}"})
+        return jsonify({
+            "message": f"Data preprocessed successfully! Cleaned file saved to {cleaned_csv_filepath}",
+            "json_saved_to": json_filepath
+        })
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
