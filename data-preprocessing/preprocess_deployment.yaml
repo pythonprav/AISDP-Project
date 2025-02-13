@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-preprocessing
+  labels:
+    app: data-preprocessing
+spec:
+  replicas: 3  # Ensures high availability (Scaling)
+  selector:
+    matchLabels:
+      app: data-preprocessing
+  strategy:
+    type: RollingUpdate  # Enables smooth rollouts and rollbacks
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: data-preprocessing
+    spec:
+      containers:
+        - name: data-preprocessing
+          image: your-dockerhub-username/preprocess:latest  # Replace with actual Docker image
+          ports:
+            - containerPort: 5000
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          env:
+            - name: FLASK_ENV
+              value: "production"
+          livenessProbe:  # Checks if the container is still alive
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:  # Checks if the app is ready to serve traffic
+            httpGet:
+              path: /ready
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          imagePullPolicy: Always
+      restartPolicy: Always  # Ensures the pod restarts if it crashes
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-preprocessing-service
+spec:
+  selector:
+    app: data-preprocessing
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+  type: LoadBalancer  # Change to "ClusterIP" if you don't need external access
