@@ -4,7 +4,7 @@ import re
 from sklearn.preprocessing import LabelEncoder
 import os
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 def clean_column(column):
     """
