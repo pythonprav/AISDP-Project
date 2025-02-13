@@ -21,16 +21,18 @@ spec:
     spec:
       containers:
       - name: model-training
-        image: pravallikadocker123/model-training:v3
+        image: pravallikadocker123/model-training:v4
         ports:
         - containerPort: 5001
         env:
         - name: ROLLBACK_ENABLED
           value: "true"  # Enable rollback for safer deployments
         - name: TRAINING_FILE_PATH
-          value: "/app/data/wine_quality_assignment.csv"  # Path to the training data
+          value: "mnt/data/clean_wine_quality.csv"  # Path to the training data
         - name: LOG_LEVEL
           value: "DEBUG"  # Set log verbosity
+        - name: SAVED_MODEL_DIR 
+          value: "/mnt/models/saved_model.pkl"
         envFrom:
         - configMapRef:
             name: model-training-config  # Includes TRAINING_FILE_PATH, LOG_LEVEL, etc.
@@ -59,14 +61,14 @@ spec:
             cpu: "1"
         volumeMounts:
         - name: data-volume
-          mountPath: /app/data  # Mount the data directory into the container
+          mountPath: /mnt/data/  # Mount the data directory into the container
         - name: model-volume
-          mountPath: /app/models  # Mount the models directory into the container
-      volumes:
-      - name: data-volume
-        persistentVolumeClaim:
-          claimName: dataset-pvc  # Persistent Volume Claim for data
-      - name: model-volume
-        persistentVolumeClaim:
-          claimName: model-pvc  # Persistent Volume Claim for models
+          mountPath: /mnt/models/  # Mount the models directory into the container
+      # volumes:
+      # - name: data-volume
+      #   persistentVolumeClaim:
+      #     claimName: dataset-pvc  # Persistent Volume Claim for data
+      # - name: model-volume
+      #   persistentVolumeClaim:
+      #     claimName: model-pvc  # Persistent Volume Claim for models
 

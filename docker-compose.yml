@@ -2,12 +2,12 @@ version: "3.9"
 
 services:
   webapp:
-    build: ./webapp
+    build: ./user-interface
     container_name: webapp
     ports:
       - "5003:5003"  # Only expose web app externally
     volumes:
-      - userinputs:/mnt/userinputs
+      - user:/mnt/user
       - data:/mnt/data
     depends_on:
       - model-training  # Ensure the model is trained before accepting input
@@ -20,10 +20,12 @@ services:
     expose:
       - "5000"
     volumes:
-      - userinputs:/mnt/userinputs
+      - raw_data:/mnt/raw_data  # 🔹 Ensures raw data is accessible
+      - user:/mnt/user
       - data:/mnt/data
     networks:
       - app_network
+    command: ["python", "/app/preprocess.py"]  # Runs preprocessing at startup
 
   model-training:
     build: ./model-training
@@ -35,7 +37,9 @@ services:
       - models:/mnt/models
     networks:
       - app_network
-    command: ["python", "/app/train.py"]  # Automatically run model training on startup
+    depends_on:
+      - data-preprocessing  # 🔹 Ensure preprocessing is completed before training starts
+    command: ["python", "/app/train_model.py"]
 
   model-inference:
     build: ./model-inference
@@ -47,11 +51,13 @@ services:
       - models:/mnt/models
     networks:
       - app_network
+    depends_on:
+      - model-training  # 🔹 Ensure trained model exists before inference
 
 volumes:
-  userinputs:
-  data:
-  models:
+  user:  # 🔹 User input for predictions
+  data:  # 🔹 Processed data storage
+  models:  # 🔹 Trained models
 
 networks:
   app_network:

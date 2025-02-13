@@ -8,8 +8,8 @@ WORKDIR /app
 
 # Copy the application code to the container
 COPY Model-Training/train_model.py ./Model-Training/
-RUN mkdir -p /app/data /app/logs /app/outputs
-# COPY data/wine_quality_assignment.csv ./data/wine_quality_assignment.csv
+# RUN mkdir -p /app/data /app/logs /app/outputs
+COPY /mnt/data/clean_wine_quality.csv ./mnt/data/clean_wine_quality.csv
 
 # Copy the requirements file to the container
 COPY Model-Training/requirements.txt .
@@ -19,10 +19,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Set environment variables for rollback and flexibility
 ENV ROLLBACK_ENABLED=true
-ENV TRAINING_FILE_PATH="./data/wine_quality_assignment.csv"
+# ENV TRAINING_FILE_PATH="./data/wine_quality_assignment.csv"
+ENV TRAINING_FILE_PATH="/mnt/data/clean_wine_quality.csv"
 ENV PYTHONUNBUFFERED=1
 ENV LOG_LEVEL=DEBUG
-
+ENV SAVED_MODEL_DIR = "/mnt/models/saved_model.pkl"
 # Create directories for logs and outputs
 RUN mkdir -p /app/logs /app/outputs
 
@@ -30,7 +31,7 @@ RUN mkdir -p /app/logs /app/outputs
 EXPOSE 5001
 
 # Add healthcheck for container status
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s CMD curl --fail http://localhost:5001/get-metrics || exit 1
+# HEALTHCHECK --interval=30s --timeout=10s --start-period=5s CMD curl --fail http://localhost:5001/get-metrics || exit 1
 
 # Define the command to run the training API
 CMD ["python", "./Model-Training/train_model.py"]

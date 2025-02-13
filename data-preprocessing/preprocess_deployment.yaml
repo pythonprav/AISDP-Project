@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: data-preprocessing
-          image: your-dockerhub-username/preprocess:latest  # Replace with actual Docker image
+          image: pengpengintotheroom/preprocess:latest  # Replace with actual Docker image
           ports:
             - containerPort: 5000
           resources:
