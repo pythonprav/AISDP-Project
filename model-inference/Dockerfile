@@ -1,22 +1,19 @@
-# Use an official Python runtime as the base image
-FROM python:3.9-slim
+# Dockerfile for Wine Quality Inference
 
-# Set the working directory in the container
+# Use official Python image
+FROM python:3.12-slim
+
+# Set working directory
 WORKDIR /app
 
-# Copy the requirements file to the container
-COPY requirements.txt .
+# Copy necessary files
+COPY . .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the inference script and any necessary files to the container
-COPY inference.py .
-COPY optimized_rf_model.pkl .
-COPY ../data/feature_names.csv ./data/
-
-# Expose the port the app runs on
+# Expose port for the API
 EXPOSE 5000
 
-# Define the command to run the application
+# Run the inference API
 CMD ["python", "inference.py"]
