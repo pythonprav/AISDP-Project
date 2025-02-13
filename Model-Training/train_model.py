@@ -167,7 +167,7 @@ def train_model():
         # Update the default filepath to match the relative path in your project
         # data_path = request.json.get('filepath','../Data/wine_quality_assignment.csv')
         # data_path = os.getenv("TRAINING_FILE_PATH", "/app/data/wine_quality_assignment.csv")
-        data_path = os.getenv("/mnt/data/clean_wine_quality.csv")
+        data_path = os.getenv("/mnt/data/cleaned_wine_quality.csv")
         wine = load_clean_data(data_path)
         # wine = preprocess_quality(wine)
         X_train, X_val, X_test, y_train, y_val, y_test = split_data(wine)

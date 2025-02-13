@@ -4,19 +4,14 @@ import pandas as pd
 import time
 
 # Define paths to Persistent Volumes (PVs)
-USER_INPUTS_DIR = "/mnt/userinputs"  # Path where Web App saves user data
-MODEL_OUTPUTS_DIR = "/mnt/data"  # Path where Model Inference saves predictions
+USER_DIR = "/mnt/user"  # Path where Web App saves user data
 
-
-DATA_DIR = "/mnt/data/"
-MODELS_DIR = "/mnt/models/"
 
 # Load trained model
-model_file = os.path.join(MODELS_DIR, "trained_model.pkl")
+model_file = os.path.join(USER_DIR, "trained_model.pkl")
 
 # Ensure directories exist
-os.makedirs(USER_INPUTS_DIR, exist_ok=True)
-os.makedirs(MODEL_OUTPUTS_DIR, exist_ok=True)
+os.makedirs(USER_DIR, exist_ok=True)
 
 app = Flask(__name__)
 
@@ -31,11 +26,11 @@ def model_pred_csv():
         # Save CSV to `userinputs` PV for processing
         csv_file = request.files["csvFile"]
         if csv_file:
-            file_path = os.path.join(USER_INPUTS_DIR, "input.csv")
+            file_path = os.path.join(USER_DIR, "input.csv")
             csv_file.save(file_path)
             
             # Wait for the processed result from Model Inference
-            output_file = os.path.join(MODEL_OUTPUTS_DIR, "predictions.csv")
+            output_file = os.path.join(USER_DIR, "predictions.csv")
             for _ in range(10):  # Wait for max ~10s
                 if os.path.exists(output_file):
                     df = pd.read_csv(output_file)
@@ -67,11 +62,11 @@ def model_pred_manual():
 
         # Convert data to DataFrame and save to `userinputs` PV
         df = pd.DataFrame([data])
-        input_file = os.path.join(USER_INPUTS_DIR, "input.csv")
+        input_file = os.path.join(USER_DIR, "input.csv")
         df.to_csv(input_file, index=False)
 
         # Wait for the processed result from Model Inference
-        output_file = os.path.join(MODEL_OUTPUTS_DIR, "predictions.csv")
+        output_file = os.path.join(USER_DIR, "predictions.csv")
         for _ in range(10):  # Wait for max ~10s
             if os.path.exists(output_file):
                 with open(output_file, "r") as f:
