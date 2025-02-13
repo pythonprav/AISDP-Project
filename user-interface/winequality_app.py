@@ -7,6 +7,13 @@ import time
 USER_INPUTS_DIR = "/mnt/userinputs"  # Path where Web App saves user data
 MODEL_OUTPUTS_DIR = "/mnt/data"  # Path where Model Inference saves predictions
 
+
+DATA_DIR = "/mnt/data/"
+MODELS_DIR = "/mnt/models/"
+
+# Load trained model
+model_file = os.path.join(MODELS_DIR, "trained_model.pkl")
+
 # Ensure directories exist
 os.makedirs(USER_INPUTS_DIR, exist_ok=True)
 os.makedirs(MODEL_OUTPUTS_DIR, exist_ok=True)
