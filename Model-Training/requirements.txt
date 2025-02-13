@@ -3,6 +3,7 @@ numpy
 Flask
 scikit-learn
 joblib
+pytest
 
 
 

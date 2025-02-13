@@ -1,0 +1,71 @@
+name: Build and Push Docker Images for All Members
+
+on:
+  push:
+    branches:
+      - main  # Trigger workflow on push to the main branch
+
+jobs:
+  # Member 1: Preprocessing Module
+  build-preprocessing:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Log in to Docker Hub (Member 1)
+      run: echo "${{ secrets.DOCKER_PASSWORD_1 }}" | docker login -u "${{ secrets.DOCKER_USERNAME_1 }}" --password-stdin
+
+    - name: Build Preprocessing Docker Image
+      run: docker build -t member1account/preprocessing:latest -f Preprocessing/Dockerfile .
+
+    - name: Push Preprocessing Docker Image
+      run: docker push member1account/preprocessing:latest
+
+  # Member 2: Model Training Module
+  build-training:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Build Training Docker Image
+      run: docker build -t pravallikadocker123/model-training:latest -f Model-Training/Dockerfile .
+
+    - name: Push Training Docker Image
+      run: docker push pravallikadocker123/model-training:latest
+      
+  # Member 3: Inference Module
+  build-inference:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Log in to Docker Hub (Member 3)
+      run: echo "${{ secrets.DOCKER_PASSWORD_3 }}" | docker login -u "${{ secrets.DOCKER_USERNAME_3 }}" --password-stdin
+
+    - name: Build Inference Docker Image
+      run: docker build -t member3account/inference:latest -f Inference/Dockerfile .
+
+    - name: Push Inference Docker Image
+      run: docker push member3account/inference:latest
+
+  # Member 4: Frontend Module
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Log in to Docker Hub (Member 4)
+      run: echo "${{ secrets.DOCKER_PASSWORD_4 }}" | docker login -u "${{ secrets.DOCKER_USERNAME_4 }}" --password-stdin
+
+    - name: Build Frontend Docker Image
+      run: docker build -t member4account/frontend:latest -f Frontend/Dockerfile .
+
+    - name: Push Frontend Docker Image
+      run: docker push member4account/frontend:latest

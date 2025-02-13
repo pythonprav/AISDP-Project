@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-training-service
+  annotations:
+    autoscaling.kubernetes.io/metrics: >-
+      {"type":"Resource","resource":{"name":"cpu","targetAverageUtilization":50}}  # Autoscaling on CPU utilization
+spec:
+  selector:
+    app: model-training
+  ports:
+    - protocol: TCP
+      port: 5001
+      targetPort: 5001
+  type: LoadBalancer  # Use LoadBalancer for external access
+

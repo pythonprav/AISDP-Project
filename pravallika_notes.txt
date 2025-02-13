@@ -1,0 +1,77 @@
+---
+### **How This Script Works**
+1. **`test_training_endpoint`**:
+   - Calls the `/train` endpoint to train the model.
+   - Ensures:
+     - The endpoint returns a success response.
+     - A valid model file (`model.pkl`) is saved.
+
+2. **`test_metrics_endpoint`**:
+   - Calls the `/get-metrics` endpoint to retrieve validation metrics.
+   - Ensures:
+     - The endpoint returns a success response.
+     - The metrics (accuracy, precision, recall, F1 score) are included.
+
+3. **`test_save_model_endpoint`**:
+   - Calls the `/save-model` endpoint to save the model.
+   - Ensures:
+     - The endpoint returns a success response.
+     - The model file (`model.pkl`) exists.
+
+---
+
+### **How to Run the Test**
+1. Start your Flask server:
+   ```bash
+   python train_model.py
+   ```
+
+2. Run the test script:
+   ```bash
+   pytest -v test_train_model.py
+   ```
+
+This script ensures your training code behaves correctly and integrates seamlessly with the API. Let me know if you need further modifications!
+
+github cloning link:
+
+ git clone --branch pravallika-branch https://pythonprav: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@github.com/pythonprav/AISDP-Project.git
+
+ build docker file code:
+ docker build -f Model-Training/"Model Training Dockerfile.dockerfile" -t pravallikadocker123/model-training:latest .
+
+
+
+Explanation for docker-image.yml
+Separate Jobs for Each Member:
+
+Each member's task is handled in its own job (e.g., build-preprocessing, build-training).
+Each job:
+Logs in to the member's Docker Hub account using their credentials.
+Builds and pushes the Docker image for the respective module.
+Different Docker Hub Credentials:
+
+Each member must set their own Docker Hub credentials (DOCKER_USERNAME and DOCKER_PASSWORD) as GitHub Secrets.
+Example Secrets:
+DOCKER_USERNAME_1 and DOCKER_PASSWORD_1 for Member 1.
+DOCKER_USERNAME_2 and DOCKER_PASSWORD_2 for Member 2.
+And so on.
+Different Dockerfiles and Images:
+
+Each job specifies the Dockerfile and image for its module.
+Example:
+Member 1 uses Preprocessing/Dockerfile and pushes member1account/preprocessing:latest.
+Member 2 uses Model-Training/Dockerfile and pushes member2account/model-training:latest.
+GitHub Secrets Setup for Each Member
+Each member must:
+
+Log in to the GitHub repository.
+Navigate to Settings > Secrets and variables > Actions.
+Add their Docker Hub credentials as repository secrets:
+Member 1:
+DOCKER_USERNAME_1: Docker Hub username.
+DOCKER_PASSWORD_1: Docker Hub password.
+Member 2:
+DOCKER_USERNAME_2: Docker Hub username.
+DOCKER_PASSWORD_2: Docker Hub password.
+Repeat for other members.
