@@ -36,9 +36,9 @@ spec:
             value: "production"
         volumeMounts:
           - name: data-volume
-            mountPath: "/app/volumes/data"
+            mountPath: "/volumes/data"
           - name: user-volume
-            mountPath: "/app/volumes/user"
+            mountPath: "/volumes/user"
         livenessProbe:
           httpGet:
             path: /health

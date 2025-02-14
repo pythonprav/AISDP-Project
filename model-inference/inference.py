@@ -7,10 +7,12 @@ import os
 app = Flask(__name__)
 
 # File paths
-MODEL_PATH = '/mnt/models/saved_model.pkl'
-INPUT_PATH = '/mnt/user/cleaned_input.csv'
-OUTPUT_PATH = '/mnt/user/predictions.csv'
-
+# MODEL_PATH = '/mnt/models/saved_model.pkl'
+# INPUT_PATH = '/mnt/user/cleaned_input.csv'
+# OUTPUT_PATH = '/mnt/user/predictions.csv'
+MODEL_PATH = "/volumes/models/saved_model.pkl"
+INPUT_PATH = "/volumes/user/cleaned_input.csv"
+OUTPUT_PATH = "/volumes/user/predictions.csv"
 
 # Step 1: Load the model
 def load_model():
@@ -67,4 +69,4 @@ def home():
 
 # Step 5: Run the application
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5002, debug=True)

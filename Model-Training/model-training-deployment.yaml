@@ -5,7 +5,7 @@ metadata:
   labels:
     app: model-training
 spec:
-  replicas: 2  # High availability
+  replicas: 3  # High availability
   selector:
     matchLabels:
       app: model-training
@@ -13,7 +13,7 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
-      maxUnavailable: 0
+      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -27,12 +27,12 @@ spec:
         env:
         - name: ROLLBACK_ENABLED
           value: "true"  # Enable rollback for safer deployments
-        - name: TRAINING_FILE_PATH
-          value: "mnt/data/clean_wine_quality.csv"  # Path to the training data
         - name: LOG_LEVEL
           value: "DEBUG"  # Set log verbosity
-        - name: SAVED_MODEL_DIR 
-          value: "/mnt/models/saved_model.pkl"
+        - name: TRAINING_FILE_PATH
+          value: "/volumes/data/clean_wine_quality.csv"  
+        - name: SAVED_MODEL_DIR
+          value: "/volumes/models/saved_model.pkl"  
         envFrom:
         - configMapRef:
             name: model-training-config  # Includes TRAINING_FILE_PATH, LOG_LEVEL, etc.
@@ -61,14 +61,14 @@ spec:
             cpu: "1"
         volumeMounts:
         - name: data-volume
-          mountPath: /mnt/data/  # Mount the data directory into the container
+          mountPath: "/volumes/data"  # Mount the data directory into the container
         - name: model-volume
-          mountPath: /mnt/models/  # Mount the models directory into the container
-      # volumes:
-      # - name: data-volume
-      #   persistentVolumeClaim:
-      #     claimName: dataset-pvc  # Persistent Volume Claim for data
-      # - name: model-volume
-      #   persistentVolumeClaim:
-      #     claimName: model-pvc  # Persistent Volume Claim for models
+          mountPath: "/volumes/models" # Mount the models directory into the container
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: dataset-pvc  # Persistent Volume Claim for data
+      - name: model-volume
+        persistentVolumeClaim:
+          claimName: model-pvc  # Persistent Volume Claim for models
 

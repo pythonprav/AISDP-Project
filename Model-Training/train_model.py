@@ -8,14 +8,16 @@ import json
 import os
 import logging
 
-DATA_DIR = "/mnt/data/"
-MODELS_DIR = "/mnt/models/"
+DATA_FOLDER = "volumes/data"
+USER_INPUTS_DIR = "volumes/user"
+TRAINING_FILE_PATH = "/volumes/data/cleaned_wine_quality.csv"
+SAVED_MODEL_DIR = "/volumes/models/saved_model.pkl"
+
 
 # Load environment variables
 # TRAINING_FILE_PATH = os.getenv("TRAINING_FILE_PATH", "../Data/wine_quality_assignment.csv")
 # TRAINING_FILE_PATH = os.getenv("TRAINING_FILE_PATH", "/app/data/wine_quality_assignment.csv")
-TRAINING_FILE_PATH = os.getenv("TRAINING_FILE_PATH", "/mnt/data/clean_wine_quality.csv")
-
+# TRAINING_FILE_PATH = os.getenv("TRAINING_FILE_PATH", "/mnt/data/clean_wine_quality.csv")
 
 # SAVED_MODEL_DIR = os.getenv("SAVED_MODEL_PATH", "./saved_model")
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
@@ -167,7 +169,7 @@ def train_model():
         # Update the default filepath to match the relative path in your project
         # data_path = request.json.get('filepath','../Data/wine_quality_assignment.csv')
         # data_path = os.getenv("TRAINING_FILE_PATH", "/app/data/wine_quality_assignment.csv")
-        data_path = os.getenv("/mnt/data/cleaned_wine_quality.csv")
+        data_path = os.getenv("TRAINING_FILE_PATH", "/mnt/data/clean_wine_quality.csv")       
         wine = load_clean_data(data_path)
         # wine = preprocess_quality(wine)
         X_train, X_val, X_test, y_train, y_val, y_test = split_data(wine)
@@ -207,7 +209,6 @@ def retrain_model():
     return train_model()
 
 
-SAVED_MODEL_DIR = "/mnt/models/"
 # # Define the path to the saved_model folder
 # SAVED_MODEL_DIR = os.path.join(os.getcwd(), "saved_model")
 # joblib.dump(rf, "/mnt/models/saved_model.pkl")
@@ -223,8 +224,8 @@ def save_model():
             # Create the saved_model folder if it doesn't exist
             os.makedirs(SAVED_MODEL_DIR, exist_ok=True)
             model_path = os.path.join(SAVED_MODEL_DIR, "saved_model.pkl")
-            joblib.dump(current_model, "/mnt/models/saved_model.pkl")
-            post_message("Model saved successfully at /mnt/models/saved_model.pkl")
+            joblib.dump(current_model, model_path)
+            # post_message("Model saved successfully at /mnt/models/saved_model.pkl")
             # joblib.dump(current_model, model_path)
             post_message(f"Model saved successfully at {model_path}.")
             return jsonify({"message": f"Model saved successfully at {model_path}!"})

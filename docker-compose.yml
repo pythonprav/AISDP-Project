@@ -5,12 +5,12 @@ services:
     build: ./user-interface
     container_name: webapp
     ports:
-      - "5003:5003"  # Only expose web app externally
+      - "5003:5003"
     volumes:
-      - user:/mnt/user
-      - data:/mnt/data
+      - user:/volumes/user
+      - data:/volumes/data
     depends_on:
-      - model-training  # Ensure the model is trained before accepting input
+      - model-inference  # Ensure inference is available before UI starts
     networks:
       - app_network
 
@@ -20,12 +20,12 @@ services:
     expose:
       - "5000"
     volumes:
-      - raw_data:/mnt/raw_data  # 🔹 Ensures raw data is accessible
-      - user:/mnt/user
-      - data:/mnt/data
+      - raw_data:/volumes/raw_data
+      - user:/volumes/user
+      - data:/volumes/data
     networks:
       - app_network
-    command: ["python", "/app/preprocess.py"]  # Runs preprocessing at startup
+    command: ["python", "./preprocess.py"]
 
   model-training:
     build: ./model-training
@@ -33,13 +33,16 @@ services:
     expose:
       - "5001"
     volumes:
-      - data:/mnt/data
-      - models:/mnt/models
+      - ./volumes/data:/volumes/data
+      - ./volumes/models:/volumes/models
+    environment:
+      - TRAINING_FILE_PATH=/volumes/data/clean_wine_quality.csv
+      - SAVED_MODEL_DIR=/volumes/models/saved_model.pkl
     networks:
       - app_network
     depends_on:
-      - data-preprocessing  # 🔹 Ensure preprocessing is completed before training starts
-    command: ["python", "/app/train_model.py"]
+      - data-preprocessing  # Ensure preprocessing completes before training
+    command: ["python", "./train_model.py"]
 
   model-inference:
     build: ./model-inference
@@ -47,12 +50,14 @@ services:
     expose:
       - "5002"
     volumes:
-      - data:/mnt/data
-      - models:/mnt/models
+      - data:/volumes/data
+      - models:/volumes/models
+      - user:/volumes/user
     networks:
       - app_network
     depends_on:
-      - model-training  # 🔹 Ensure trained model exists before inference
+      - model-training  # Ensure trained model exists before inference
+    command: ["python", "./inference.py"]
 
 volumes:
   user:  # 🔹 User input for predictions
