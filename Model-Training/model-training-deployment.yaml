@@ -5,15 +5,15 @@ metadata:
   labels:
     app: model-training
 spec:
-  replicas: 2  # High availability
+  replicas: 2
   selector:
     matchLabels:
       app: model-training
   strategy:
     type: RollingUpdate
     rollingUpdate:
+      maxUnavailable: 1
       maxSurge: 1
-      maxUnavailable: 0
   template:
     metadata:
       labels:
@@ -21,54 +21,42 @@ spec:
     spec:
       containers:
       - name: model-training
-        image: pravallikadocker123/model-training:v4
+        image: model-training:latest
         ports:
-        - containerPort: 5001
-        env:
-        - name: ROLLBACK_ENABLED
-          value: "true"  # Enable rollback for safer deployments
-        - name: TRAINING_FILE_PATH
-          value: "mnt/data/clean_wine_quality.csv"  # Path to the training data
-        - name: LOG_LEVEL
-          value: "DEBUG"  # Set log verbosity
-        - name: SAVED_MODEL_DIR 
-          value: "/mnt/models/saved_model.pkl"
-        envFrom:
-        - configMapRef:
-            name: model-training-config  # Includes TRAINING_FILE_PATH, LOG_LEVEL, etc.
-        # - secretRef:
-        #     name: github-token            
-        # - secretRef:
-        #     name: docker-credentials  # Includes DOCKER_USERNAME, DOCKER_PASSWORD
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 5001
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 5001
-          initialDelaySeconds: 10
-          periodSeconds: 20
+          - containerPort: 5000
+        volumeMounts:
+          - name: data-volume
+            mountPath: /app/volumes/data
+          - name: model-volume
+            mountPath: /app/volumes/models
+          - name: user-volume
+            mountPath: /app/volumes/user
         resources:
           requests:
             memory: "256Mi"
-            cpu: "500m"
+            cpu: "250m"
           limits:
             memory: "512Mi"
-            cpu: "1"
-        volumeMounts:
-        - name: data-volume
-          mountPath: /mnt/data/  # Mount the data directory into the container
-        - name: model-volume
-          mountPath: /mnt/models/  # Mount the models directory into the container
-      # volumes:
-      # - name: data-volume
-      #   persistentVolumeClaim:
-      #     claimName: dataset-pvc  # Persistent Volume Claim for data
-      # - name: model-volume
-      #   persistentVolumeClaim:
-      #     claimName: model-pvc  # Persistent Volume Claim for models
-
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: dataset-pvc
+      - name: model-volume
+        persistentVolumeClaim:
+          claimName: model-pvc
+      - name: user-volume
+        persistentVolumeClaim:
+          claimName: userinput-pvc
