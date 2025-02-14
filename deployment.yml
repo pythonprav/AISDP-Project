@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: webapp-deployment
+  name: user-interface-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: webapp
+      app: user-interface
   template:
     metadata:
       labels:
-        app: webapp
+        app: user-interface
     spec:
       containers:
-      - name: webapp
-        image: myrepo/webapp:latest
+      - name: user-interface
+        image: myrepo/user-interface:latest
         ports:
         - containerPort: 5003
         volumeMounts:
