@@ -1,82 +1,91 @@
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 import os
-from flask import Flask, render_template, request
 import pandas as pd
-import time
-
-# Define paths to Persistent Volumes (PVs)
-USER_DIR = "/mnt/user"  # Path where Web App saves user data
-
-
-# Load trained model
-model_file = os.path.join(USER_DIR, "trained_model.pkl")
-
-# Ensure directories exist
-os.makedirs(USER_DIR, exist_ok=True)
 
 app = Flask(__name__)
 
-@app.route("/")
-def index():
-    """Render the home page (index.html)."""
-    return render_template("index.html")
+# 1. The Home Route (Serves index.html)
+@app.route('/')
+def home():
+    return render_template('index.html')
 
-@app.route("/model_pred_csv", methods=["GET", "POST"])
-def model_pred_csv():
-    if request.method == "POST":
-        # Save CSV to `userinputs` PV for processing
-        csv_file = request.files["csvFile"]
-        if csv_file:
-            file_path = os.path.join(USER_DIR, "input.csv")
-            csv_file.save(file_path)
-            
-            # Wait for the processed result from Model Inference
-            output_file = os.path.join(USER_DIR, "predictions.csv")
-            for _ in range(10):  # Wait for max ~10s
-                if os.path.exists(output_file):
-                    df = pd.read_csv(output_file)
-                    return render_template("model_pred_csv.html", tables=df.to_html())
-                time.sleep(1)
-            
-            return "Processing took too long. Try again later."
+# 2. CSV Upload Route
+@app.route('/upload_csv', methods=['POST'])
+def upload_csv():
+    try:
+        # 2a. Check if a file was uploaded
+        if 'csvFile' not in request.files:
+            return "No file part in request.", 400
+        
+        file = request.files['csvFile']
+        
+        if file.filename == '':
+            return "No file selected.", 400
+        
+        # 2b. Save the CSV to volumes/user/input.csv
+        user_dir = os.path.join(os.getcwd(), '../volumes/user')
+        os.makedirs(user_dir, exist_ok=True)
+        save_path = os.path.join(user_dir, 'input.csv')
+        file.save(save_path)
 
-    return render_template("model_pred_csv.html")
+        # 2c. Redirect or respond with success
+        return render_template('model_pred_csv.html', 
+                               message="CSV uploaded successfully! Now you can run the preprocessing.")
 
-@app.route("/model_pred_manual", methods=["GET", "POST"])
-def model_pred_manual():
-    if request.method == "POST":
-        # Collect input values from the form
+    except Exception as e:
+        return str(e), 500
+
+# 3. Manual Prediction Route
+@app.route('/predict_manual', methods=['POST'])
+def predict_manual():
+    try:
+        # 3a. Extract form data
+        fixed_acidity = request.form.get('fixed_acidity')
+        volatile_acidity = request.form.get('volatile_acidity')
+        citric_acid = request.form.get('citric_acid')
+        residual_sugar = request.form.get('residual_sugar')
+        chlorides = request.form.get('chlorides')
+        free_sulfur_dioxide = request.form.get('free_sulfur_dioxide')
+        total_sulfur_dioxide = request.form.get('total_sulfur_dioxide')
+        density = request.form.get('density')
+        pH = request.form.get('pH')
+        sulphates = request.form.get('sulphates')
+        alcohol = request.form.get('alcohol')
+        color = request.form.get('color')  # "red" or "white"
+
+        # 3b. Construct DataFrame
         data = {
-            "fixed_acidity": float(request.form.get("fixed_acidity")),
-            "volatile_acidity": float(request.form.get("volatile_acidity")),
-            "citric_acid": float(request.form.get("citric_acid")),
-            "residual_sugar": float(request.form.get("residual_sugar")),
-            "chlorides": float(request.form.get("chlorides")),
-            "free_sulfur_dioxide": float(request.form.get("free_sulfur_dioxide")),
-            "total_sulfur_dioxide": float(request.form.get("total_sulfur_dioxide")),
-            "density": float(request.form.get("density")),
-            "pH": float(request.form.get("pH")),
-            "sulphates": float(request.form.get("sulphates")),
-            "alcohol": float(request.form.get("alcohol")),
-            "color": request.form.get("color")
+            'fixed_acidity': [fixed_acidity],
+            'volatile_acidity': [volatile_acidity],
+            'citric_acid': [citric_acid],
+            'residual_sugar': [residual_sugar],
+            'chlorides': [chlorides],
+            'free_sulfur_dioxide': [free_sulfur_dioxide],
+            'total_sulfur_dioxide': [total_sulfur_dioxide],
+            'density': [density],
+            'pH': [pH],
+            'sulphates': [sulphates],
+            'alcohol': [alcohol],
+            'color': [color]
         }
+        df = pd.DataFrame(data)
 
-        # Convert data to DataFrame and save to `userinputs` PV
-        df = pd.DataFrame([data])
-        input_file = os.path.join(USER_DIR, "input.csv")
-        df.to_csv(input_file, index=False)
+        # 3c. Save this row to volumes/user/cleaned_input.csv 
+        # (although the real cleaning might happen in the preprocessing container)
+        user_dir = os.path.join(os.getcwd(), '../volumes/user')
+        os.makedirs(user_dir, exist_ok=True)
+        save_path = os.path.join(user_dir, 'cleaned_input.csv')
+        df.to_csv(save_path, index=False)
 
-        # Wait for the processed result from Model Inference
-        output_file = os.path.join(USER_DIR, "predictions.csv")
-        for _ in range(10):  # Wait for max ~10s
-            if os.path.exists(output_file):
-                with open(output_file, "r") as f:
-                    prediction = f.read().strip()
-                return render_template("model_pred_manual.html", prediction=prediction)
-            time.sleep(1)
+        # 3d. We could call the inference container or just display a message for now
+        return render_template('model_pred_manual.html',
+                               message="Manual input received! Cleaned data saved. Please run inference.")
 
-        return "Processing took too long. Try again later."
+    except Exception as e:
+        return str(e), 500
 
-    return render_template("model_pred_manual.html")
+# 4. Possibly a route to display predictions or fetch them from volumes/user/predictions.json
 
+# 5. Run the Flask app
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5003)

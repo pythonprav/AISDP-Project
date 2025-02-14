@@ -1,23 +1,18 @@
-# Use an official Python runtime as a parent image
-FROM python:3.9
+# Use an official Python runtime as the base image
+FROM python:3.9-slim
 
-# Set the working directory inside the container
-WORKDIR /winequality_app
+# Set the working directory
+WORKDIR /app
 
-# Copy application files into the container
-COPY . .
-
-# Install Python dependencies
+# Copy the requirements and install dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Create necessary directories (ensures volume paths exist)
-RUN mkdir -p /mnt/userinputs /mnt/data
+# Copy the entire user-interface folder into the container
+COPY . /app
 
+# Expose port
 EXPOSE 5003
 
-# Set environment variables for Flask
-ENV FLASK_APP=app.py
-ENV FLASK_RUN_HOST=0.0.0.0
-
-# Command to run the Flask application
+# Run the Flask app
 CMD ["python", "winequality_app.py"]
