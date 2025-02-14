@@ -5,11 +5,6 @@ FROM python:3.9-slim
 # Set the working directory in the container
 WORKDIR /app
 
-<<<<<<< Updated upstream:model-training/model_training.dockerfile
-# Copy the application code to the container
-COPY model-training/train_model.py ./  
-COPY model-training/requirements.txt ./  
-=======
 # Create necessary directories
 # RUN mkdir -p /mnt/data /mnt/models /app/logs /app/outputs
 # RUN mkdir -p /volumes/data /volumes/models
@@ -21,7 +16,6 @@ COPY model-training/requirements.txt ./
 COPY train_model.py ./  
 COPY requirements.txt ./ 
 
->>>>>>> Stashed changes:model-training/ model_training.dockerfile
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
