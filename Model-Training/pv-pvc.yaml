@@ -1,95 +1,73 @@
-kind: PersistentVolumeClaim
 apiVersion: v1
-metadata:
-  name: dataset-pvc  
-spec:
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 5Gi
----
 kind: PersistentVolume
-apiVersion: v1
 metadata:
   name: dataset-pv
 spec:
   capacity:
-    storage: 5Gi
+    storage: 2Gi
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: /mnt/AISDP-Project/data
-  persistentVolumeReclaimPolicy: Retain
+    path: "/app/volumes/data"
+
 ---
-kind: PersistentVolumeClaim
 apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
-  name: model-pvc  
+  name: dataset-pvc
 spec:
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: 5Gi
+      storage: 2Gi
+
 ---
-kind: PersistentVolume
 apiVersion: v1
+kind: PersistentVolume
 metadata:
   name: model-pv
 spec:
   capacity:
-    storage: 5Gi
+    storage: 1Gi
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: /mnt/AISDP-Project/model
-  persistentVolumeReclaimPolicy: Retain
+    path: "/app/volumes/models"
+
 ---
-kind: PersistentVolumeClaim
 apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
-  name: userinput-pvc  
+  name: model-pvc
 spec:
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: 5Gi
+      storage: 1Gi
+
 ---
-kind: PersistentVolume
 apiVersion: v1
+kind: PersistentVolume
 metadata:
   name: userinput-pv
 spec:
   capacity:
-    storage: 5Gi
+    storage: 500Mi
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: /mnt/AISDP-Project/userinput
-  persistentVolumeReclaimPolicy: Retain
+    path: "/app/volumes/user"
 
-# kind: PersistentVolume
-# apiVersion: v1
-# metadata:
-#   name: data-pv
-# spec:
-#   capacity:
-#     storage: 5Gi
-#   accessModes:
-#     - ReadWriteMany
-#   hostPath:
-#     path: /mnt/AISDP-Project/Data
-#   persistentVolumeReclaimPolicy: Retain
-# ---
-# kind: PersistentVolumeClaim
-# apiVersion: v1
-# metadata:
-#   name: data-pvc
-# spec:
-#   accessModes:
-#     - ReadWriteMany
-#   resources:
-#     requests:
-#       storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: userinput-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Mi
