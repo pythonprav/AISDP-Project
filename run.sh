@@ -22,26 +22,34 @@ docker push $DOCKER_USERNAME/model-training:latest
 docker push $DOCKER_USERNAME/model-inference:latest
 
 # ✅ Step 3: Apply Persistent Storage
-echo "💾 Applying Persistent Volumes..."
+echo "💾 Creating Persistent Volumes and Claims..."
 kubectl apply -f pv-pvc.yml
 
-# ✅ Step 4: Deploy Application
+# ✅ Step 4: Wait for the Persistent Volume to be Bound
+echo "⏳ Waiting for Persistent Volume to be Bound..."
+kubectl wait --for=condition=Bound pvc/raw-data-pvc --timeout=60s
+
+# ✅ Step 5: Deploy Application
 echo "🚀 Deploying Kubernetes Services..."
 kubectl apply -f deployment.yml
 
-# ✅ Step 5: Wait for All Pods to Be Ready
-echo "🔄 Waiting for all pods to be ready..."
-kubectl wait --for=condition=Ready pod --all --timeout=300s
+# ✅ Step 6: Wait for Data-Preprocessing Pod to be Ready
+echo "🔄 Waiting for data-preprocessing pod to be ready..."
+kubectl wait --for=condition=Ready pod -l app=data-preprocessing --timeout=120s
 
-# ✅ Step 6: Verify Deployments
+# ✅ Step 7: Copy CSV File into Persistent Volume
+echo "📂 Copying raw_data/wine_quality_assignment.csv into Kubernetes volume..."
+kubectl cp raw_data/wine_quality_assignment.csv $(kubectl get pods -l app=data-preprocessing -o jsonpath="{.items[0].metadata.name}"):/mnt/data/raw_data/wine_quality_assignment.csv
+
+# ✅ Step 8: Verify Deployments
 echo "🔎 Checking deployment status..."
 kubectl get pods
 kubectl get services
 
-# ✅ Step 7: Get Web App URL
+# ✅ Step 9: Get Web App URL
 echo "🌐 Fetching Web App URL..."
 WEBAPP_URL=$(minikube service webapp-service --url)
 
-# ✅ Step 8: Display Success Message
+# ✅ Step 10: Display Success Message
 echo "✅ Deployment Completed Successfully!"
 echo "🌍 Web App is available at: $WEBAPP_URL"
