@@ -1,0 +1,145 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-interface-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-interface
+  template:
+    metadata:
+      labels:
+        app: user-interface
+    spec:
+      containers:
+      - name: user-interface
+        image: myrepo/user-interface:latest
+        ports:
+        - containerPort: 5003
+        volumeMounts:
+        - name: user-volume
+          mountPath: "/volumes/user"
+        - name: data-volume
+          mountPath: "/volumes/data"
+      volumes:
+      - name: user-volume
+        persistentVolumeClaim:
+          claimName: user-pvc
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: data-pvc
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-preprocessing-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-preprocessing
+  template:
+    metadata:
+      labels:
+        app: data-preprocessing
+    spec:
+      containers:
+      - name: data-preprocessing
+        image: myrepo/data-preprocessing:latest
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: raw-data-volume
+          mountPath: "/volumes/raw_data"
+        - name: user-volume
+          mountPath: "/volumes/user"
+        - name: data-volume
+          mountPath: "/volumes/data"
+        command: ["python", "./preprocess.py"]
+      volumes:
+      - name: raw-data-volume
+        persistentVolumeClaim:
+          claimName: raw-data-pvc
+      - name: user-volume
+        persistentVolumeClaim:
+          claimName: user-pvc
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: data-pvc
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-training-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: model-training
+  template:
+    metadata:
+      labels:
+        app: model-training
+    spec:
+      containers:
+      - name: model-training
+        image: myrepo/model-training:latest
+        ports:
+        - containerPort: 5001
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/volumes/data"
+        - name: models-volume
+          mountPath: "/volumes/models"
+        env:
+        - name: TRAINING_FILE_PATH
+          value: "/volumes/data/clean_wine_quality.csv"
+        - name: SAVED_MODEL_DIR
+          value: "/volumes/models/saved_model.pkl"
+        command: ["python", "./train_model.py"]
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: data-pvc
+      - name: models-volume
+        persistentVolumeClaim:
+          claimName: models-pvc
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-inference-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: model-inference
+  template:
+    metadata:
+      labels:
+        app: model-inference
+    spec:
+      containers:
+      - name: model-inference
+        image: myrepo/model-inference:latest
+        ports:
+        - containerPort: 5002
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/volumes/data"
+        - name: models-volume
+          mountPath: "/volumes/models"
+        - name: user-volume
+          mountPath: "/volumes/user"
+        command: ["python", "./inference.py"]
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: data-pvc
+      - name: models-volume
+        persistentVolumeClaim:
+          claimName: models-pvc
+      - name: user-volume
+        persistentVolumeClaim:
+          claimName: user-pvc
