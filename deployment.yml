@@ -29,7 +29,9 @@ spec:
       - name: data-volume
         persistentVolumeClaim:
           claimName: data-pvc
+      restartPolicy: Always
 
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -67,7 +69,9 @@ spec:
       - name: data-volume
         persistentVolumeClaim:
           claimName: data-pvc
+      restartPolicy: Always
 
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -93,8 +97,8 @@ spec:
         - name: models-volume
           mountPath: "/volumes/models"
         env:
-        - name: TRAINING_FILE_PATH
-          value: "/volumes/data/clean_wine_quality.csv"
+        - name: TRAINING_FILE_PATH  # ✅ Fixed filename to match preprocessing output
+          value: "/volumes/data/cleaned_wine_quality.csv"
         - name: SAVED_MODEL_DIR
           value: "/volumes/models/saved_model.pkl"
         command: ["python", "./train_model.py"]
@@ -105,7 +109,9 @@ spec:
       - name: models-volume
         persistentVolumeClaim:
           claimName: models-pvc
+      restartPolicy: Always
 
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -143,3 +149,4 @@ spec:
       - name: user-volume
         persistentVolumeClaim:
           claimName: user-pvc
+      restartPolicy: Always

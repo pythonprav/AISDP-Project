@@ -4,9 +4,10 @@ metadata:
   name: webapp-service
 spec:
   selector:
-    app: user-interface  # Matches pods with label "app: webapp"
+    app: user-interface  # Matches pods with label "app: user-interface"
   ports:
     - protocol: TCP
-      port: 80         # Public access port
-      targetPort: 5003 # Container's internal port
-  type: LoadBalancer  # Change to NodePort for local testing
+      port: 5003  # ✅ Matches the Web App's port
+      targetPort: 5003
+      nodePort: 30003  # ✅ Allows access via NodePort
+  type: NodePort  # ✅ Change this to LoadBalancer if deploying on cloud
