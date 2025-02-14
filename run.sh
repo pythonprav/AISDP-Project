@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 🚀 Set Variables
-DOCKER_USERNAME="myrepo"  # Change this to your Docker Hub username
+DOCKER_USERNAME="pravallikadocker123"  # Change this to your Docker Hub username
 K8S_NAMESPACE="default"   # Change if using a different namespace
 
 echo "🚀 Starting Deployment Process..."

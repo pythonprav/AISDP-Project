@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: user-interface
-        image: myrepo/user-interface:latest
+        image: pravallikadocker123/user-interface:latest
         ports:
         - containerPort: 5003
         volumeMounts:
@@ -46,7 +46,7 @@ spec:
     spec:
       containers:
       - name: data-preprocessing
-        image: myrepo/data-preprocessing:latest
+        image: pravallikadocker123/data-preprocessing:latest
         ports:
         - containerPort: 5000
         volumeMounts:
@@ -84,7 +84,7 @@ spec:
     spec:
       containers:
       - name: model-training
-        image: myrepo/model-training:latest
+        image: pravallikadocker123/model-training:latest
         ports:
         - containerPort: 5001
         volumeMounts:
@@ -122,7 +122,7 @@ spec:
     spec:
       containers:
       - name: model-inference
-        image: myrepo/model-inference:latest
+        image: pravallikadocker123/model-inference:latest
         ports:
         - containerPort: 5002
         volumeMounts:
