@@ -8,7 +8,7 @@ from sklearn.preprocessing import LabelEncoder
 app = Flask(__name__)
 
 # Directory Paths (adjust for Docker)
-# RAW_DATA_FOLDER = "data-preprocessing/raw_data"   # For local runs
+RAW_DATA_FOLDER = "volumes/raw_data"   # For local runs
 DATA_FOLDER = "volumes/data"
 USER_INPUTS_DIR = "volumes/user"
 
