@@ -18,7 +18,6 @@ def convert_csv_to_json():
     Converts wine_quality_assignment.csv to JSON and saves it in the volumes/data folder.
     """
     csv_file = os.path.join(DATA_FOLDER, "wine_quality_assignment.csv")
-    csv_file = os.path.join(DATA_FOLDER, "wine_quality_assignment.csv")
     json_file = os.path.join(DATA_FOLDER, "wine_quality.json")
 
     # Ensure the data folder exists

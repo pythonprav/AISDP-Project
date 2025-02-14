@@ -4,11 +4,8 @@ import pandas as pd
 import time
 
 # Define paths to Persistent Volumes (PVs)
-USER_DIR = "/mnt/user"  # Path where Web App saves user data
+USER_DIR = "/volumes/user"  # Path where Web App saves user data
 
-
-# Load trained model
-model_file = os.path.join(USER_DIR, "trained_model.pkl")
 
 # Ensure directories exist
 os.makedirs(USER_DIR, exist_ok=True)

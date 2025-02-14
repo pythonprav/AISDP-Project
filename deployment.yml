@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: user-interface
-        image: pravallikadocker123/user-interface:latest
+        image: rionewman/user-interface:latest
         ports:
         - containerPort: 5003
         volumeMounts:
@@ -48,7 +48,7 @@ spec:
     spec:
       containers:
       - name: data-preprocessing
-        image: pravallikadocker123/data-preprocessing:latest
+        image: rionewman/data-preprocessing:latest
         ports:
         - containerPort: 5000
         volumeMounts:
@@ -88,7 +88,7 @@ spec:
     spec:
       containers:
       - name: model-training
-        image: pravallikadocker123/model-training:latest
+        image: rionewman/model-training:latest
         ports:
         - containerPort: 5001
         volumeMounts:
@@ -128,7 +128,7 @@ spec:
     spec:
       containers:
       - name: model-inference
-        image: pravallikadocker123/model-inference:latest
+        image: rionewman/model-inference:latest
         ports:
         - containerPort: 5002
         volumeMounts:
