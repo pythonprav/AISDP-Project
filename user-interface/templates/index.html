@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Wine Quality Testing</title>
-  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <header>
@@ -16,8 +16,8 @@
     <main class="home-container container">
       <h2>Select Input Method</h2>
       <div class="button-group">
-        <a href="model_pred_csv.html" class="btn">CSV Input</a>
-        <a href="model_pred_manual.html" class="btn">Manual Input</a>
+        <a href="/model_pred_csv" class="btn">CSV Input</a>
+        <a href="/model_pred_manual" class="btn">Manual Input</a>
       </div>
     </main>
   
