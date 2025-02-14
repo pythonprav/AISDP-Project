@@ -9,7 +9,11 @@ app = Flask(__name__)
 
 # Directory Paths (adjust for Docker)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 RAW_DATA_FOLDER = "volumes/raw_data"   # For local runs
+=======
+# RAW_DATA_FOLDER = "data-preprocessing/raw_data"   # For local runs
+>>>>>>> Stashed changes
 =======
 # RAW_DATA_FOLDER = "data-preprocessing/raw_data"   # For local runs
 >>>>>>> Stashed changes

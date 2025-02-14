@@ -1,6 +1,7 @@
 #!/bin/bash
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # 🚀 Set Variables
 DOCKER_USERNAME="myrepo"  # Change this to your Docker Hub username
 K8S_NAMESPACE="default"   # Change if using a different namespace
@@ -44,6 +45,8 @@ kubectl get svc webapp-service -n $K8S_NAMESPACE
 
 echo "✅ Deployment Completed Successfully! 🚀"
 =======
+=======
+>>>>>>> Stashed changes
 # Define Variables
 PREPROCESS_IMAGE="pengpengintotheroom/preprocess"
 PREPROCESS_CONTAINER="data-preprocessing-container"
@@ -233,5 +236,9 @@ echo ""
 echo "====================================="
 echo "🚀 STEP 14: Fetching Inference Logs..."
 echo "====================================="
+<<<<<<< Updated upstream
+docker logs -f $INFERENCE_CONTAINER
+>>>>>>> Stashed changes
+=======
 docker logs -f $INFERENCE_CONTAINER
 >>>>>>> Stashed changes
