@@ -5,20 +5,8 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Copy only necessary files
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
 COPY model-inference/requirements.txt ./  
 COPY model-inference/inference.py ./  
-=======
-COPY requirements.txt ./
-#Only copying inference-related code
-COPY inference.py ./  
->>>>>>> Stashed changes
-=======
-COPY requirements.txt ./
-#Only copying inference-related code
-COPY inference.py ./  
->>>>>>> Stashed changes
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
@@ -27,16 +15,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 5002
 
 # Run the inference application
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
 CMD ["python", "./inference.py"]
 
-=======
-CMD ["python", "inference.py"]
->>>>>>> Stashed changes
-=======
-CMD ["python", "inference.py"]
->>>>>>> Stashed changes
 
 
 # Use an official Python runtime as the base image
@@ -57,5 +37,7 @@ CMD ["python", "inference.py"]
 # # Expose the Flask app port
 # EXPOSE 5000
 
+# # Run the preprocessing application
+# CMD ["python", "preprocess.py"]
 # # Run the preprocessing application
 # CMD ["python", "preprocess.py"]
