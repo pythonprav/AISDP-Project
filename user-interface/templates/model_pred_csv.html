@@ -21,18 +21,24 @@
         <button type="submit" class="btn">Submit CSV</button>
       </form>
   
-      <<div id="outputCSV">
+      <div id="outputCSV">
         <h2>Result</h2>
         {% if predictions %}
-            <ul>
-                {% for pred in predictions %}
-                <li>{{ pred }}</li>
-                {% endfor %}
-            </ul>
+            {% if predictions.status == 'error' %}
+                <p style="color:red;">Error: {{ predictions.details }}</p>
+            {% else %}
+                <h3>Predicted Wine Quality</h3>
+                <ul>
+                    {% for pred in predictions.predictions_preview %}
+                        <li>Quality: {{ pred.predicted_quality }}</li>
+                    {% endfor %}
+                </ul>
+                <p>Output saved at: {{ predictions.output_path }}</p>
+            {% endif %}
         {% else %}
             <p>No predictions available yet. Please upload a CSV file and submit.</p>
         {% endif %}
-    </div>
+      </div>
     </main>
   
     <footer>
