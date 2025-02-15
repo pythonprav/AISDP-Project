@@ -77,21 +77,20 @@ def upload_csv():
         if not file or file.filename == '':
             return "No file selected.", 400
 
-        user_dir = os.path.join(os.getcwd(), '../volumes/user')
-        os.makedirs(user_dir, exist_ok=True)  # Make sure the directory exists
-        save_path = os.path.join(user_dir, 'input.csv')  # File will be saved here
+        # FIXED PATH: Use Docker volume path directly
+        user_dir = "/app/volumes/user"
+        os.makedirs(user_dir, exist_ok=True)
+        save_path = os.path.join(user_dir, 'input.csv')
 
-        # Add 'sample' column for CSV uploads
-        df = pd.read_csv(file)  # Read the uploaded CSV
-        if 'sample' not in df.columns:  # Check if 'sample' column exists, if not, add it
+        df = pd.read_csv(file)
+        if 'sample' not in df.columns:
             df['sample'] = range(1, len(df) + 1)
-        df.to_csv(save_path, index=False)  # Save the CSV to volumes/user/input.csv
+        df.to_csv(save_path, index=False)
 
-        # After saving, run inference (this will be handled later)
+        # Run inference after saving input
         inference_response = run_inference()
 
-        return render_template('model_pred_csv.html', predictions=inference_response)  # Show predictions
-
+        return render_template('model_pred_csv.html', predictions=inference_response)
     except Exception as e:
         return str(e), 500
 
@@ -101,7 +100,7 @@ def upload_csv():
 ##################################################
 @app.route('/predict_manual', methods=['POST'])
 def predict_manual():
-    """Handle manual input, run inference, and show predictions."""
+    """Handle manual input and trigger inference."""
     try:
         data = {
             'fixed_acidity': [request.form.get('fixed_acidity')],
@@ -118,11 +117,11 @@ def predict_manual():
             'color': [request.form.get('color')]
         }
 
-        user_dir = os.path.join(os.getcwd(), '../volumes/user')
+        # FIXED PATH: Use Docker volume path directly
+        user_dir = "/app/volumes/user"
         os.makedirs(user_dir, exist_ok=True)
         save_path = os.path.join(user_dir, 'cleaned_input.csv')
 
-        # Add 'sample' column for manual inputs
         df = pd.DataFrame(data)
         if 'sample' not in df.columns:
             df['sample'] = range(1, len(df) + 1)
@@ -131,7 +130,6 @@ def predict_manual():
         inference_response = run_inference()
 
         return render_template('model_pred_manual.html', predictions=inference_response)
-
     except Exception as e:
         return str(e), 500
 
@@ -141,13 +139,12 @@ def predict_manual():
 ##################################################
 @app.route('/get_predictions', methods=['GET'])
 def get_predictions():
-    """Fetch predictions from predictions.json and display them in the UI."""
-    predictions_path = os.path.join(os.getcwd(), '../volumes/user/predictions.json')
+    """Fetch predictions from JSON output file."""
+    predictions_path = "/app/volumes/user/predictions.json"
     try:
         with open(predictions_path, 'r') as file:
             predictions = json.load(file)
         return jsonify(predictions)
-
     except FileNotFoundError:
         return jsonify({"error": "Predictions file not found. Run inference first."})
     except Exception as e:
