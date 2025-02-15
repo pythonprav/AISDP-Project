@@ -107,10 +107,12 @@ def upload_csv():
         # Save input.csv
         input_csv_path = os.path.join(user_dir, 'input.csv')
         df = pd.read_csv(file)
-        if 'sample' not in df.columns:
-            df['sample'] = range(1, len(df) + 1)
+        
+        # Add 'Sample' column if missing
+        if 'Sample' not in df.columns:
+            df['Sample'] = range(1, len(df) + 1)
         df.to_csv(input_csv_path, index=False)
-
+            
         # Save cleaned_input.csv
         cleaned_csv_path = os.path.join(user_dir, 'cleaned_input.csv')
         df.to_csv(cleaned_csv_path, index=False)
@@ -152,10 +154,13 @@ def predict_manual():
         # Save input.csv
         input_csv_path = os.path.join(user_dir, 'input.csv')
         df = pd.DataFrame(data)
-        if 'sample' not in df.columns:
-            df['sample'] = range(1, len(df) + 1)
+        
+        # Add 'Sample' column if missing
+        if 'Sample' not in df.columns:
+            df['Sample'] = range(1, len(df) + 1)
+            
         df.to_csv(input_csv_path, index=False)
-
+        
         # Save cleaned_input.csv
         cleaned_csv_path = os.path.join(user_dir, 'cleaned_input.csv')
         df.to_csv(cleaned_csv_path, index=False)
