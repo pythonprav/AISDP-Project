@@ -1,21 +1,25 @@
-# Use Python 3.9-slim as the base image
-FROM python:3.9-slim
+# Base image
+FROM python:3.11-slim
 
-# Set the working directory inside the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the requirements file and install dependencies
-COPY requirements.txt .
+# Install kubectl
+RUN apt-get update && apt-get install -y curl && \
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
+    chmod +x kubectl && \
+    mv kubectl /usr/local/bin/
+
+# Install dependencies
+COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all files from the current directory to the container
+# Copy the app files
 COPY . .
 
-# Create directories for models and user predictions
-RUN mkdir -p /app/volumes/models /app/volumes/user
+# Expose port
+EXPOSE 5003
 
-# Expose port 5001 for inference
-EXPOSE 5001
-
-# Run the inference service
-CMD ["python", "inference.py"]
+# Run the application
+ENTRYPOINT ["python3"]
+CMD ["winequality_app.py"]

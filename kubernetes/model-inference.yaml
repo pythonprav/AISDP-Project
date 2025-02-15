@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-inference
+  labels:
+    app: model-inference
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: model-inference
+  template:
+    metadata:
+      labels:
+        app: model-inference
+    spec:
+      containers:
+      - name: model-inference
+        image: pariikubavat/model-inference:latest
+        volumeMounts:
+        - name: user-volume
+          mountPath: /app/volumes/user
+        - name: models-volume
+          mountPath: /app/volumes/models
+        ports:
+        - containerPort: 5001
+      volumes:
+      - name: user-volume
+        hostPath:
+          path: /Users/pariikubavat/Documents/GitHub/AISDP-Project/AISDP/volumes/user
+      - name: models-volume
+        hostPath:
+          path: /Users/pariikubavat/Documents/GitHub/AISDP-Project/AISDP/volumes/models
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-inference-service
+spec:
+  selector:
+    app: model-inference
+  ports:
+    - protocol: TCP
+      port: 5001
+      targetPort: 5001
+  type: ClusterIP

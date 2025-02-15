@@ -1,20 +1,29 @@
-# Use an official Python runtime as the base image
+# Base image: Python 3.9 slim
 FROM python:3.9-slim
 
-# Set the working directory
+# Set working directory
 WORKDIR /app
 
-# Copy the requirements and install dependencies
+# Copy requirements and install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN apt-get update && apt-get install -y docker.io
+# Install docker.io for Docker commands
+RUN apt-get update && \
+    apt-get install -y docker.io curl && \
+    apt-get clean
 
-# Copy the entire user-interface folder into the container
+# Install kubectl for Kubernetes commands inside container
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
+    chmod +x kubectl && \
+    mv kubectl /usr/local/bin/kubectl && \
+    apt-get clean
+
+# Copy application files
 COPY . /app
 
-# Expose port
+# Expose port for Flask app
 EXPOSE 5003
 
-# Run the Flask app
-CMD ["python", "winequality_app.py"]
+# Run the Flask application
+CMD ["python3", "winequality_app.py"]

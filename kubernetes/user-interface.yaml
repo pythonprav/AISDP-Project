@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-interface
+  namespace: default
+  labels:
+    app: user-interface
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-interface
+  template:
+    metadata:
+      labels:
+        app: user-interface
+    spec:
+      serviceAccountName: user-interface-sa  # <-- Added service account
+      containers:
+      - name: user-interface
+        image: pariikubavat/user-interface:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5003
+        volumeMounts:
+        - name: volumes-user
+          mountPath: /app/volumes/user
+        - name: volumes-data
+          mountPath: /app/volumes/data
+        - name: volumes-models
+          mountPath: /app/volumes/models
+        env:
+        - name: KUBECONFIG
+          value: "/root/.kube/config"
+        securityContext:
+          runAsUser: 0  # Run as root (required for Docker-in-Docker commands)
+      volumes:
+      - name: volumes-user
+        hostPath:
+          path: /Users/pariikubavat/Documents/GitHub/AISDP-Project/AISDP/volumes/user
+      - name: volumes-data
+        hostPath:
+          path: /Users/pariikubavat/Documents/GitHub/AISDP-Project/AISDP/volumes/data
+      - name: volumes-models
+        hostPath:
+          path: /Users/pariikubavat/Documents/GitHub/AISDP-Project/AISDP/volumes/models
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-interface-service
+  namespace: default
+spec:
+  selector:
+    app: user-interface
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 5003         # Service Port
+      targetPort: 5003   # Container Port
+      nodePort: 31277    # NodePort (Access on host machine via localhost:31277)
