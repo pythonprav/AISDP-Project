@@ -11,7 +11,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the application code into the container
 COPY . .
 
-# Create necessary directories for persistent storage
+# Create directories for persistent storage
 RUN mkdir -p /app/volumes/data /app/volumes/user
 
 # Expose the application port

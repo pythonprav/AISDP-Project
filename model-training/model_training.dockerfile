@@ -1,4 +1,4 @@
-# Use Python 3.9 (same as preprocessing for compatibility)
+# Use Python 3.9 (same as preprocessing)
 FROM python:3.9-slim
 
 # Set the working directory

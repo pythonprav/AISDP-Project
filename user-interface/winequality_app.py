@@ -21,24 +21,31 @@ app = Flask(__name__,
 def run_inference():
     """Trigger the model-inference container via 'kubectl exec'."""
     try:
-        # Run inference in model-inference pod using kubectl
+        # Get the pod name dynamically
+        command_get_pod = ["kubectl", "get", "pods", "-l", "app=model-inference", "-o", "jsonpath='{.items[0].metadata.name}'"]
+        pod_name = subprocess.check_output(command_get_pod, shell=True).decode('utf-8').strip("'")
+
+        if not pod_name:
+            return {"status": "error", "details": "Could not find model-inference pod."}
+
+        # Run inference in the model-inference pod using kubectl
         command = [
-            "kubectl", "exec", "deployment/model-inference", "--",
+            "kubectl", "exec", pod_name, "--",
             "python3", "/app/inference.py"
         ]
-        
+
         result = subprocess.run(command, capture_output=True, text=True)
-        
+
         if result.returncode != 0:
             return {"status": "error", "details": result.stderr}
-        
+
         predictions_path = "/app/volumes/user/predictions.json"
         if not os.path.exists(predictions_path):
             return {"status": "error", "details": "predictions.json not found"}
-        
+
         with open(predictions_path, 'r') as file:
             predictions = json.load(file)
-        
+
         return predictions
 
     except Exception as e:
