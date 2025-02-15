@@ -5,11 +5,11 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Copy requirements file and install dependencies
-COPY requirements.txt .
+COPY ./data-preprocessing/requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the application code into the container
-COPY . .
+COPY ./data-preprocessing/ .
 
 # Create directories for persistent storage
 RUN mkdir -p /app/volumes/data /app/volumes/user

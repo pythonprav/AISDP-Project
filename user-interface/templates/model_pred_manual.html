@@ -145,7 +145,7 @@
               <input 
                   type="radio" 
                   name="color" 
-                  value="red" 
+                  value="1" 
                   checked 
               /> Red
             </label>
@@ -153,7 +153,7 @@
               <input 
                   type="radio" 
                   name="color" 
-                  value="white" 
+                  value="0" 
               /> White
             </label>
         </div>
@@ -165,19 +165,27 @@
       <div id="outputManual">
         <h2>Result</h2>
         {% if predictions %}
-            <ul>
-                {% for pred in predictions %}
-                <li>{{ pred }}</li>
-                {% endfor %}
-            </ul>
+            {% if predictions.status == 'error' %}
+                <p style="color:red;">⚠️ Error: {{ predictions.details }}</p>
+            {% elif 'predictions_preview' in predictions %}
+                <h3>Predicted Wine Quality:</h3>
+                <ul>
+                    {% for pred in predictions.predictions_preview %}
+                        <li>Quality Score: {{ pred.predicted_quality }}</li>
+                    {% endfor %}
+                </ul>
+                <p style="color:green;">📂 Output saved at: {{ predictions.output_path }}</p>
+            {% else %}
+                <p style="color:orange;">⚠️ No predictions found in the response.</p>
+            {% endif %}
         {% else %}
-            <p>No predictions available yet. Please fill in the fields and submit.</p>
+            <p>No predictions available yet. Please enter values and submit.</p>
         {% endif %}
-    </div>
+      </div>
     </main>
   
     <footer>
       <p>&copy; 2025 My Wine Quality App</p>
     </footer>
-  </body>
-  
+</body>
+</html>

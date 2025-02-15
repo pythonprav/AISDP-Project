@@ -1,7 +1,8 @@
 # ---------------------------------------------------
-# FULLY FIXED: winequality_app.py 
-# Overwrites input.csv and cleaned_input.csv for CSV & Manual
-# Uses Kubernetes (kubectl) for model inference
+# FINAL: winequality_app.py 
+# ✅ Runs Inference Correctly (Kubernetes)
+# ✅ Handles CSV and Manual Input
+# ✅ Displays Predictions Properly on UI
 # ---------------------------------------------------
 
 from flask import Flask, render_template, request, jsonify
@@ -10,6 +11,9 @@ import pandas as pd
 import json
 import subprocess
 
+# -----------------------------------------------
+# APP SETUP
+# -----------------------------------------------
 app = Flask(__name__, 
     static_folder="static", 
     template_folder="templates"
@@ -19,36 +23,46 @@ app = Flask(__name__,
 # FUNCTION: RUN MODEL INFERENCE via Kubernetes
 ##################################################
 def run_inference():
-    """Trigger the model-inference container via 'kubectl exec'."""
+    """Trigger the model-inference container via 'kubectl exec' and return predictions."""
     try:
-        # Get the pod name dynamically
-        command_get_pod = ["kubectl", "get", "pods", "-l", "app=model-inference", "-o", "jsonpath='{.items[0].metadata.name}'"]
-        pod_name = subprocess.check_output(command_get_pod, shell=True).decode('utf-8').strip("'")
+        # 🟡 Step 1: Get Pod Name Correctly
+        command_get_pod = "kubectl get pods -l app=model-inference -o jsonpath='{.items[0].metadata.name}'"
+        result = subprocess.run(command_get_pod, shell=True, capture_output=True, text=True)
+        pod_name = result.stdout.strip().strip("'")
 
-        if not pod_name:
-            return {"status": "error", "details": "Could not find model-inference pod."}
+        if result.returncode != 0 or not pod_name:
+            print(f"❌ Error Finding Pod: {result.stderr}")
+            return {"status": "error", "details": "Model-inference pod not found."}
 
-        # Run inference in the model-inference pod using kubectl
+        print(f"✅ Model-Inference Pod Found: {pod_name}")
+
+        # 🟡 Step 2: Run Inference via `kubectl exec`
         command = [
             "kubectl", "exec", pod_name, "--",
             "python3", "/app/inference.py"
         ]
+        inference_result = subprocess.run(command, capture_output=True, text=True)
 
-        result = subprocess.run(command, capture_output=True, text=True)
+        if inference_result.returncode != 0:
+            print(f"⚠️ Inference Error: {inference_result.stderr}")
+            return {"status": "error", "details": inference_result.stderr}
 
-        if result.returncode != 0:
-            return {"status": "error", "details": result.stderr}
+        print("📝 Inference Output:", inference_result.stdout)
 
+        # 🟡 Step 3: Load predictions.json
         predictions_path = "/app/volumes/user/predictions.json"
         if not os.path.exists(predictions_path):
-            return {"status": "error", "details": "predictions.json not found"}
+            print("⚠️ No predictions.json found after inference.")
+            return {"status": "error", "details": "No predictions found. Check inference logs."}
 
         with open(predictions_path, 'r') as file:
             predictions = json.load(file)
 
+        print("📊 Predictions:", predictions)
         return predictions
 
     except Exception as e:
+        print(f"❌ Inference Failed: {e}")
         return {"status": "error", "details": str(e)}
 
 

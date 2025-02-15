@@ -20,20 +20,26 @@
         <input type="file" name="csvFile" id="csvFile" accept=".csv" required />
         <button type="submit" class="btn">Submit CSV</button>
       </form>
-  
+
+      <br>
+
       <div id="outputCSV">
         <h2>Result</h2>
+
+        <!-- ✅ Display Predictions if Available -->
         {% if predictions %}
             {% if predictions.status == 'error' %}
-                <p style="color:red;">Error: {{ predictions.details }}</p>
-            {% else %}
-                <h3>Predicted Wine Quality</h3>
+                <p style="color:red;">⚠️ Error: {{ predictions.details }}</p>
+            {% elif 'predictions_preview' in predictions %}
+                <h3>Predicted Wine Quality:</h3>
                 <ul>
                     {% for pred in predictions.predictions_preview %}
-                        <li>Quality: {{ pred.predicted_quality }}</li>
+                        <li>Quality Score: {{ pred.predicted_quality }}</li>
                     {% endfor %}
                 </ul>
-                <p>Output saved at: {{ predictions.output_path }}</p>
+                <p style="color:green;">📂 Output saved at: {{ predictions.output_path }}</p>
+            {% else %}
+                <p style="color:orange;">⚠️ No predictions found in the response.</p>
             {% endif %}
         {% else %}
             <p>No predictions available yet. Please upload a CSV file and submit.</p>
@@ -44,6 +50,5 @@
     <footer>
       <p>&copy; 2025 My Wine Quality App</p>
     </footer>
-  </body>
-  
+</body>
 </html>

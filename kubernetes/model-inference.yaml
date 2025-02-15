@@ -14,6 +14,7 @@ spec:
       labels:
         app: model-inference
     spec:
+      serviceAccountName: user-interface-sa  # << ADD THIS
       containers:
       - name: model-inference
         image: pariikubavat/model-inference:latest
@@ -31,6 +32,7 @@ spec:
       - name: models-volume
         hostPath:
           path: /Users/pariikubavat/Documents/GitHub/AISDP-Project/AISDP/volumes/models
+
 ---
 apiVersion: v1
 kind: Service

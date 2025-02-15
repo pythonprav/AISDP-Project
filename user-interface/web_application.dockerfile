@@ -5,7 +5,7 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Copy requirements and install dependencies
-COPY requirements.txt .
+COPY ./user-interface/requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Install docker.io for Docker commands
@@ -20,7 +20,7 @@ RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/s
     apt-get clean
 
 # Copy application files
-COPY . /app
+COPY ./user-interface/ .
 
 # Expose port for Flask app
 EXPOSE 5003
