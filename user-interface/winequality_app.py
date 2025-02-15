@@ -5,8 +5,8 @@ import json
 import subprocess
 
 app = Flask(__name__, 
-    static_folder="static",     # <-- Tells Flask where your static files (css/js) live
-    template_folder="templates" # <-- Tells Flask where your HTML templates live
+    static_folder="static",     # Static files: CSS, JS
+    template_folder="templates" # HTML templates
 )
 
 
@@ -16,7 +16,6 @@ app = Flask(__name__,
 def run_inference():
     """Trigger the model-inference container."""
     try:
-        # Command to run the model-inference container
         command = [
             "docker", "run", "--rm",
             "-v", "/app/volumes/data:/app/volumes/data",
@@ -25,14 +24,11 @@ def run_inference():
             "pariikubavat/model-inference:latest"
         ]
         
-        # Execute the Docker command
         result = subprocess.run(command, capture_output=True, text=True)
         
-        # Check result
         if result.returncode != 0:
             return {"status": "error", "details": result.stderr}
         
-        # Read predictions from the generated predictions.json
         predictions_path = "/app/volumes/user/predictions.json"
         with open(predictions_path, 'r') as file:
             predictions = json.load(file)
@@ -81,16 +77,18 @@ def upload_csv():
         if not file or file.filename == '':
             return "No file selected.", 400
 
-        # Save uploaded CSV as input.csv
         user_dir = os.path.join(os.getcwd(), '../volumes/user')
         os.makedirs(user_dir, exist_ok=True)
         save_path = os.path.join(user_dir, 'input.csv')
-        file.save(save_path)
 
-        # Run inference
+        # Add 'sample' column for CSV uploads
+        df = pd.read_csv(file)
+        if 'sample' not in df.columns:
+            df['sample'] = range(1, len(df) + 1)
+        df.to_csv(save_path, index=False)
+
         inference_response = run_inference()
 
-        # Show predictions in the same page
         return render_template('model_pred_csv.html', predictions=inference_response)
 
     except Exception as e:
@@ -104,7 +102,6 @@ def upload_csv():
 def predict_manual():
     """Handle manual input, run inference, and show predictions."""
     try:
-        # Collect form inputs
         data = {
             'fixed_acidity': [request.form.get('fixed_acidity')],
             'volatile_acidity': [request.form.get('volatile_acidity')],
@@ -120,16 +117,18 @@ def predict_manual():
             'color': [request.form.get('color')]
         }
 
-        # Save to cleaned_input.csv
         user_dir = os.path.join(os.getcwd(), '../volumes/user')
         os.makedirs(user_dir, exist_ok=True)
         save_path = os.path.join(user_dir, 'cleaned_input.csv')
-        pd.DataFrame(data).to_csv(save_path, index=False)
 
-        # Run inference
+        # Add 'sample' column for manual inputs
+        df = pd.DataFrame(data)
+        if 'sample' not in df.columns:
+            df['sample'] = range(1, len(df) + 1)
+        df.to_csv(save_path, index=False)
+
         inference_response = run_inference()
 
-        # Show predictions on the page
         return render_template('model_pred_manual.html', predictions=inference_response)
 
     except Exception as e:
@@ -146,7 +145,6 @@ def get_predictions():
     try:
         with open(predictions_path, 'r') as file:
             predictions = json.load(file)
-
         return jsonify(predictions)
 
     except FileNotFoundError:
@@ -159,5 +157,4 @@ def get_predictions():
 # RUN THE FLASK APP
 ##################################################
 if __name__ == "__main__":
-    # Using port 5003 as per your preference
     app.run(host="0.0.0.0", port=5003, debug=True)

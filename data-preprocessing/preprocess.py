@@ -105,6 +105,10 @@ def process_user_input():
         df = pd.read_csv(USER_INPUT_CSV)
         df = preprocess_data_logic(df)
 
+        # Ensure 'sample' column exists for user uploads
+        if 'sample' not in df.columns:
+            df['sample'] = range(1, len(df) + 1)
+
         # Save cleaned user input
         os.makedirs(USER_INPUTS_DIR, exist_ok=True)
         df.to_csv(CLEANED_USER_INPUT_CSV, index=False)
