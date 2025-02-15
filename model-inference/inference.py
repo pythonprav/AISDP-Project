@@ -28,6 +28,9 @@ def predict():
 
         # Load and predict
         df = pd.read_csv(INPUT_PATH)
+        # Drop 'sample' column if it exists to match model training features
+        if 'sample' in df.columns:
+            df.drop(columns=['sample'], inplace=True)
         predictions = model.predict(df)
 
         # Save predictions to JSON
