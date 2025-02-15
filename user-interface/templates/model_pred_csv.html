@@ -21,10 +21,18 @@
         <button type="submit" class="btn">Submit CSV</button>
       </form>
   
-      <div id="outputCSV">
+      <<div id="outputCSV">
         <h2>Result</h2>
-        <p>Your results will appear here after processing the CSV.</p>
-      </div>
+        {% if predictions %}
+            <ul>
+                {% for pred in predictions %}
+                <li>{{ pred }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No predictions available yet. Please upload a CSV file and submit.</p>
+        {% endif %}
+    </div>
     </main>
   
     <footer>

@@ -164,8 +164,16 @@
   
       <div id="outputManual">
         <h2>Result</h2>
-        <p>The predicted wine quality will appear here.</p>
-      </div>
+        {% if predictions %}
+            <ul>
+                {% for pred in predictions %}
+                <li>{{ pred }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No predictions available yet. Please fill in the fields and submit.</p>
+        {% endif %}
+    </div>
     </main>
   
     <footer>
