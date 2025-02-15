@@ -19,9 +19,9 @@ spec:
         - containerPort: 5003
         volumeMounts:
         - name: user-volume
-          mountPath: "/volumes/user"
+          mountPath: "/mnt/user"
         - name: data-volume
-          mountPath: "/volumes/data"
+          mountPath: "/mnt/data"
       volumes:
       - name: user-volume
         persistentVolumeClaim:
@@ -32,32 +32,23 @@ spec:
       restartPolicy: Always
 
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: data-preprocessing-deployment
+  name: data-preprocessing-job
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: data-preprocessing
   template:
-    metadata:
-      labels:
-        app: data-preprocessing
     spec:
       containers:
       - name: data-preprocessing
         image: rionewman/data-preprocessing:latest
-        ports:
-        - containerPort: 5000
         volumeMounts:
         - name: raw-data-volume
-          mountPath: "/volumes/raw_data"
+          mountPath: "/mnt/raw_data"
         - name: user-volume
-          mountPath: "/volumes/user"
+          mountPath: "/mnt/user"
         - name: data-volume
-          mountPath: "/volumes/data"
+          mountPath: "/mnt/data"
         command: ["python", "./preprocess.py"]
       volumes:
       - name: raw-data-volume
@@ -69,38 +60,32 @@ spec:
       - name: data-volume
         persistentVolumeClaim:
           claimName: data-pvc
-      restartPolicy: Always
+      restartPolicy: Never
+  backoffLimit: 4  # Retries up to 4 times if it fails
 
 ---
-apiVersion: apps/v1
-kind: Deployment
+
+
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: model-training-deployment
+  name: model-training-job
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: model-training
   template:
-    metadata:
-      labels:
-        app: model-training
     spec:
       containers:
       - name: model-training
         image: rionewman/model-training:latest
-        ports:
-        - containerPort: 5001
         volumeMounts:
         - name: data-volume
-          mountPath: "/volumes/data"
+          mountPath: "/mnt/data"
         - name: models-volume
-          mountPath: "/volumes/models"
+          mountPath: "/mnt/models"
         env:
-        - name: TRAINING_FILE_PATH  # ✅ Fixed filename to match preprocessing output
-          value: "/volumes/data/cleaned_wine_quality.csv"
+        - name: TRAINING_FILE_PATH
+          value: "/mnt/data/cleaned_wine_quality.csv"
         - name: SAVED_MODEL_DIR
-          value: "/volumes/models/saved_model.pkl"
+          value: "/mnt/models/saved_model.pkl"
         command: ["python", "./train_model.py"]
       volumes:
       - name: data-volume
@@ -109,35 +94,28 @@ spec:
       - name: models-volume
         persistentVolumeClaim:
           claimName: models-pvc
-      restartPolicy: Always
+      restartPolicy: Never
+  backoffLimit: 4
 
 ---
-apiVersion: apps/v1
-kind: Deployment
+
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: model-inference-deployment
+  name: model-inference-job
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: model-inference
   template:
-    metadata:
-      labels:
-        app: model-inference
     spec:
       containers:
       - name: model-inference
         image: rionewman/model-inference:latest
-        ports:
-        - containerPort: 5002
         volumeMounts:
         - name: data-volume
-          mountPath: "/volumes/data"
+          mountPath: "/mnt/data"
         - name: models-volume
-          mountPath: "/volumes/models"
+          mountPath: "/mnt/models"
         - name: user-volume
-          mountPath: "/volumes/user"
+          mountPath: "/mnt/user"
         command: ["python", "./inference.py"]
       volumes:
       - name: data-volume
@@ -149,4 +127,5 @@ spec:
       - name: user-volume
         persistentVolumeClaim:
           claimName: user-pvc
-      restartPolicy: Always
+      restartPolicy: Never
+  backoffLimit: 4

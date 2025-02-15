@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-interface-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-interface
+  template:
+    metadata:
+      labels:
+        app: user-interface
+    spec:
+      containers:
+      - name: user-interface
+        image: rionewman/user-interface:latest
+        ports:
+        - containerPort: 5003
+        volumeMounts:
+        - name: user-volume
+          mountPath: "/mnt/user"
+        - name: data-volume
+          mountPath: "/mnt/data"
+      volumes:
+      - name: user-volume
+        persistentVolumeClaim:
+          claimName: user-pvc
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: data-pvc
+      restartPolicy: Always

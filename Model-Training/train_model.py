@@ -8,10 +8,10 @@ import json
 import os
 import logging
 
-DATA_FOLDER = "volumes/data"
-USER_INPUTS_DIR = "volumes/user"
-TRAINING_FILE_PATH = "/volumes/data/cleaned_wine_quality.csv"
-SAVED_MODEL_DIR = "/volumes/models/saved_model.pkl"
+DATA_FOLDER = "mnt/data"
+USER_INPUTS_DIR = "mnt/user"
+TRAINING_FILE_PATH = "/mnt/data/cleaned_wine_quality.csv"
+SAVED_MODEL_DIR = "/mnt/models/saved_model.pkl"
 
 
 # Load environment variables

@@ -33,13 +33,17 @@ kubectl wait --for=condition=Bound pvc/raw-data-pvc --timeout=60s
 echo "🚀 Deploying Kubernetes Services..."
 kubectl apply -f deployment.yml
 
+# ✅ Step 5.5: Deploy Kubernetes Service
+echo "🚀 Deploying Kubernetes Service..."
+kubectl apply -f service.yml
+
 # ✅ Step 6: Wait for Data-Preprocessing Pod to be Ready
 echo "🔄 Waiting for data-preprocessing pod to be ready..."
 kubectl wait --for=condition=Ready pod -l app=data-preprocessing --timeout=120s
 
 # ✅ Step 7: Copy CSV File into Persistent Volume
 echo "📂 Copying raw_data/wine_quality_assignment.csv into Kubernetes volume..."
-kubectl cp raw_data/wine_quality_assignment.csv $(kubectl get pods -l app=data-preprocessing -o jsonpath="{.items[0].metadata.name}"):/mnt/data/raw_data/wine_quality_assignment.csv
+kubectl cp mnt/raw_data/wine_quality_assignment.csv $(kubectl get pods -l job-name=data-preprocessing-job -o jsonpath="{.items[0].metadata.name}"):/mnt/raw_data/wine_quality_assignment.csv
 
 # ✅ Step 8: Verify Deployments
 echo "🔎 Checking deployment status..."

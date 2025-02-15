@@ -4,7 +4,7 @@ import pandas as pd
 import time
 
 # Define paths to Persistent Volumes (PVs)
-USER_DIR = "/volumes/user"  # Path where Web App saves user data
+USER_DIR = "/mnt/user"  # Path where Web App saves user data
 
 
 # Ensure directories exist

@@ -10,9 +10,9 @@ app = Flask(__name__)
 # MODEL_PATH = '/mnt/models/saved_model.pkl'
 # INPUT_PATH = '/mnt/user/cleaned_input.csv'
 # OUTPUT_PATH = '/mnt/user/predictions.csv'
-MODEL_PATH = "/volumes/models/saved_model.pkl"
-INPUT_PATH = "/volumes/user/cleaned_input.csv"
-OUTPUT_PATH = "/volumes/user/predictions.csv"
+MODEL_PATH = "/mnt/models/saved_model.pkl"
+INPUT_PATH = "/mnt/user/cleaned_input.csv"
+OUTPUT_PATH = "/mnt/user/predictions.csv"
 
 # Step 1: Load the model
 def load_model():
