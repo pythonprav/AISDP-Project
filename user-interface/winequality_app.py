@@ -78,18 +78,19 @@ def upload_csv():
             return "No file selected.", 400
 
         user_dir = os.path.join(os.getcwd(), '../volumes/user')
-        os.makedirs(user_dir, exist_ok=True)
-        save_path = os.path.join(user_dir, 'input.csv')
+        os.makedirs(user_dir, exist_ok=True)  # Make sure the directory exists
+        save_path = os.path.join(user_dir, 'input.csv')  # File will be saved here
 
         # Add 'sample' column for CSV uploads
-        df = pd.read_csv(file)
-        if 'sample' not in df.columns:
+        df = pd.read_csv(file)  # Read the uploaded CSV
+        if 'sample' not in df.columns:  # Check if 'sample' column exists, if not, add it
             df['sample'] = range(1, len(df) + 1)
-        df.to_csv(save_path, index=False)
+        df.to_csv(save_path, index=False)  # Save the CSV to volumes/user/input.csv
 
+        # After saving, run inference (this will be handled later)
         inference_response = run_inference()
 
-        return render_template('model_pred_csv.html', predictions=inference_response)
+        return render_template('model_pred_csv.html', predictions=inference_response)  # Show predictions
 
     except Exception as e:
         return str(e), 500
