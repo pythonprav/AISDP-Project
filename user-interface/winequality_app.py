@@ -130,6 +130,9 @@ def predict_manual():
         # Create DataFrame
         df = pd.DataFrame(data)
 
+        # Add Sample column (ensure it is first)
+        df.insert(0, 'Sample', range(1, len(df) + 1))  # This will add Sample as the first column
+
         # Format input to match training
         df = format_input_dataframe(df)
 
@@ -138,7 +141,7 @@ def predict_manual():
         df.to_csv(os.path.join(USER_DIR, 'input.csv'), index=False)
         df.to_csv(os.path.join(USER_DIR, 'cleaned_input.csv'), index=False)
 
-        # ✅ Run Inference
+        # Run Inference
         inference_response = run_inference()
 
         return render_template('model_pred_manual.html', predictions=inference_response)
