@@ -11,6 +11,14 @@ app = Flask(__name__, static_folder="static", template_folder="templates")
 USER_DIR = "/app/volumes/user"
 PREDICTIONS_PATH = os.path.join(USER_DIR, 'predictions.json')
 
+# Columns based on your 'cleaned_wine_quality.csv' training data
+TRAINING_COLUMNS = [
+    'Sample', 'fixed_acidity', 'volatile_acidity', 'citric_acid', 
+    'residual_sugar', 'chlorides', 'free_sulfur_dioxide', 
+    'total_sulfur_dioxide', 'density', 'pH', 
+    'sulphates', 'alcohol', 'color'
+]
+
 ##################################################
 # FUNCTION: RUN MODEL INFERENCE (Docker Direct Call)
 ##################################################
@@ -20,12 +28,32 @@ def run_inference():
         response = requests.post("http://model-inference:5001/predict")
 
         if response.status_code == 200:
-            return response.json()
+            predictions = response.json()
+
+            # Save predictions to predictions.json
+            with open(PREDICTIONS_PATH, 'w') as file:
+                json.dump(predictions, file, indent=4)
+
+            return predictions
         else:
             return {"status": "error", "details": f"Model-inference error: {response.text}"}
 
     except Exception as e:
         return {"status": "error", "details": f"Failed to connect to model-inference: {str(e)}"}
+
+##################################################
+# FUNCTION: FORMAT INPUT DATA
+##################################################
+def format_input_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    """Ensure proper columns and order for the model."""
+    # Add 'Sample' column if missing
+    if 'Sample' not in df.columns:
+        df.insert(0, 'Sample', range(1, len(df) + 1))
+
+    # Reorder columns to match training
+    df = df[[col for col in TRAINING_COLUMNS if col in df.columns]]
+
+    return df
 
 ##################################################
 # ROUTES
@@ -46,7 +74,9 @@ def model_pred_csv():
 def model_pred_manual():
     return render_template('model_pred_manual.html')
 
+##################################################
 # 4. CSV UPLOAD HANDLING
+##################################################
 @app.route('/upload_csv', methods=['POST'])
 def upload_csv():
     """Handle CSV upload and trigger inference."""
@@ -60,23 +90,23 @@ def upload_csv():
         input_csv_path = os.path.join(USER_DIR, 'input.csv')
         df = pd.read_csv(file)
 
-        # Add 'Sample' column if missing
-        if 'Sample' not in df.columns:
-            df['Sample'] = range(1, len(df) + 1)
+        # Format input to match training
+        df = format_input_dataframe(df)
+
+        # Save input.csv and cleaned_input.csv
         df.to_csv(input_csv_path, index=False)
+        df.to_csv(os.path.join(USER_DIR, 'cleaned_input.csv'), index=False)
 
-        # Save cleaned_input.csv
-        cleaned_csv_path = os.path.join(USER_DIR, 'cleaned_input.csv')
-        df.to_csv(cleaned_csv_path, index=False)
-
-        # Call Inference (Direct Docker Network)
+        # Run inference and display results
         inference_response = run_inference()
         return render_template('model_pred_csv.html', predictions=inference_response)
 
     except Exception as e:
         return str(e), 500
 
+##################################################
 # 5. MANUAL INPUT HANDLING
+##################################################
 @app.route('/predict_manual', methods=['POST'])
 def predict_manual():
     """Handle manual input and trigger inference."""
@@ -97,26 +127,38 @@ def predict_manual():
             'color': [request.form.get('color')]
         }
 
-        # Save input.csv
-        os.makedirs(USER_DIR, exist_ok=True)
-        input_csv_path = os.path.join(USER_DIR, 'input.csv')
+        # Create DataFrame
         df = pd.DataFrame(data)
 
-        # Add 'Sample' column if missing
-        if 'Sample' not in df.columns:
-            df['Sample'] = range(1, len(df) + 1)
-        df.to_csv(input_csv_path, index=False)
+        # Format input to match training
+        df = format_input_dataframe(df)
 
-        # Save cleaned_input.csv
-        cleaned_csv_path = os.path.join(USER_DIR, 'cleaned_input.csv')
-        df.to_csv(cleaned_csv_path, index=False)
+        # Save input.csv and cleaned_input.csv
+        os.makedirs(USER_DIR, exist_ok=True)
+        df.to_csv(os.path.join(USER_DIR, 'input.csv'), index=False)
+        df.to_csv(os.path.join(USER_DIR, 'cleaned_input.csv'), index=False)
 
-        # Call Inference (Direct Docker Network)
+        # Run inference and display results
         inference_response = run_inference()
         return render_template('model_pred_manual.html', predictions=inference_response)
 
     except Exception as e:
         return str(e), 500
+
+##################################################
+# 6. FETCH PREDICTIONS (For API)
+##################################################
+@app.route('/get_predictions', methods=['GET'])
+def get_predictions():
+    """Return predictions from predictions.json."""
+    try:
+        with open(PREDICTIONS_PATH, 'r') as file:
+            predictions = json.load(file)
+        return jsonify(predictions)
+    except FileNotFoundError:
+        return jsonify({"error": "Predictions file not found."})
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 ##################################################
 # START FLASK APP
