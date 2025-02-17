@@ -4,12 +4,12 @@ FROM python:3.9-slim
 # Set the working directory
 WORKDIR /app
 
-# Copy requirements file and install dependencies
-COPY ./data-preprocessing/requirements.txt requirements.txt
+# Copy and install dependencies
+COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application code into the container
-COPY ./data-preprocessing/ .
+# Copy all files into the container
+COPY . .
 
 # Create directories for persistent storage
 RUN mkdir -p /app/volumes/data /app/volumes/user
