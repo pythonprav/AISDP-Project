@@ -25,56 +25,51 @@
 
       <div id="outputCSV">
         <h2>Result</h2>
-
+      
         {% if predictions %}
-            {% if error %}
-                <p style="color:red;">⚠️ Error: {{ error }}</p>
-            {% elif predictions %}
+            {% if predictions.status == 'error' %}
+                <p style="color:red;">⚠️ Error: {{ predictions.details }}</p>
+            {% elif 'predictions_preview' in predictions %}
                 <h3>Predicted Wine Quality Results:</h3>
-
-                <!-- ✅ Display Detailed Table -->
-                <table border="1" cellpadding="10" cellspacing="0" style="width:100%; border-collapse:collapse;">
-                  <thead style="background-color:#f2f2f2;">
-                    <tr>
-                      <th>Sample</th>
-                      <th>Fixed Acidity</th>
-                      <th>Volatile Acidity</th>
-                      <th>Citric Acid</th>
-                      <th>Residual Sugar</th>
-                      <th>Chlorides</th>
-                      <th>Free SO₂</th>
-                      <th>Total SO₂</th>
-                      <th>Density</th>
-                      <th>pH</th>
-                      <th>Sulphates</th>
-                      <th>Alcohol</th>
-                      <th>Color</th>
-                      <th>Predicted Quality</th>
+                <table border="1" style="width:100%; border-collapse: collapse;">
+                    <tr style="background-color:#ddd;">
+                        <th>Sample</th>
+                        <th>Fixed Acidity</th>
+                        <th>Volatile Acidity</th>
+                        <th>Citric Acid</th>
+                        <th>Residual Sugar</th>
+                        <th>Chlorides</th>
+                        <th>Free SO₂</th>
+                        <th>Total SO₂</th>
+                        <th>Density</th>
+                        <th>pH</th>
+                        <th>Sulphates</th>
+                        <th>Alcohol</th>
+                        <th>Color</th>
+                        <th style="color:green;">Predicted Quality</th>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {% for pred in predictions %}
+                    {% for pred in predictions.predictions_preview %}
                     <tr>
-                      <td>{{ pred.Sample }}</td>
-                      <td>{{ pred.fixed_acidity }}</td>
-                      <td>{{ pred.volatile_acidity }}</td>
-                      <td>{{ pred.citric_acid }}</td>
-                      <td>{{ pred.residual_sugar }}</td>
-                      <td>{{ pred.chlorides }}</td>
-                      <td>{{ pred.free_sulfur_dioxide }}</td>
-                      <td>{{ pred.total_sulfur_dioxide }}</td>
-                      <td>{{ pred.density }}</td>
-                      <td>{{ pred.pH }}</td>
-                      <td>{{ pred.sulphates }}</td>
-                      <td>{{ pred.alcohol }}</td>
-                      <td>{{ pred.color }}</td>
-                      <td style="font-weight:bold; color:green;">{{ pred['Predicted Quality'] }}</td>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ pred.fixed_acidity }}</td>
+                        <td>{{ pred.volatile_acidity }}</td>
+                        <td>{{ pred.citric_acid }}</td>
+                        <td>{{ pred.residual_sugar }}</td>
+                        <td>{{ pred.chlorides }}</td>
+                        <td>{{ pred.free_sulfur_dioxide }}</td>
+                        <td>{{ pred.total_sulfur_dioxide }}</td>
+                        <td>{{ pred.density }}</td>
+                        <td>{{ pred.pH }}</td>
+                        <td>{{ pred.sulphates }}</td>
+                        <td>{{ pred.alcohol }}</td>
+                        <td>{{ pred.color }}</td>
+                        <td style="font-weight:bold; color:green;">
+                            {{ pred.predicted_quality if pred.predicted_quality else "N/A" }}
+                        </td>
                     </tr>
                     {% endfor %}
-                  </tbody>
                 </table>
-
-                <p style="color:green;">📂 Output saved at: volumes/user/predictions.json</p>
+                <p style="color:green;">📂 Output saved at: {{ predictions.output_path }}</p>
             {% else %}
                 <p style="color:orange;">⚠️ No predictions found in the response.</p>
             {% endif %}

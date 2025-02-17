@@ -158,19 +158,19 @@ def predict_manual():
         return str(e), 500
     
 ##################################################
-# 6. FETCH PREDICTIONS (For API)
+# FETCH PREDICTIONS (For API)
 ##################################################
-# @app.route('/get_predictions', methods=['GET'])
-# def get_predictions():
-#     """Return predictions from predictions.json."""
-#     try:
-#         with open(PREDICTIONS_PATH, 'r') as file:
-#             predictions = json.load(file)
-#         return jsonify(predictions)
-#     except FileNotFoundError:
-#         return jsonify({"error": "Predictions file not found."})
-#     except Exception as e:
-#         return jsonify({"error": str(e)})
+@app.route('/get_predictions', methods=['GET'])
+def get_predictions():
+    """Return predictions from predictions.json."""
+    try:
+        with open(PREDICTIONS_PATH, 'r') as file:
+            predictions = json.load(file)
+        return jsonify(predictions)
+    except FileNotFoundError:
+        return jsonify({"error": "Predictions file not found."})
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 ##################################################
 # START FLASK APP
