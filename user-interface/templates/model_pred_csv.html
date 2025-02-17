@@ -31,8 +31,10 @@
                 <p style="color:red;">⚠️ Error: {{ predictions.details }}</p>
             {% elif 'predictions_preview' in predictions %}
                 <h3>Predicted Wine Quality Results:</h3>
-                <table border="1" style="width:100%; border-collapse: collapse;">
-                    <tr style="background-color:#ddd;">
+                <div class="table-container">
+                  <table>
+                    <thead>
+                      <tr>
                         <th>Sample</th>
                         <th>Fixed Acidity</th>
                         <th>Volatile Acidity</th>
@@ -46,10 +48,12 @@
                         <th>Sulphates</th>
                         <th>Alcohol</th>
                         <th>Color</th>
-                        <th style="color:green;">Predicted Quality</th>
-                    </tr>
-                    {% for pred in predictions.predictions_preview %}
-                    <tr>
+                        <th class="highlight-quality">Predicted Quality</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for pred in predictions.predictions_preview %}
+                      <tr>
                         <td>{{ loop.index }}</td>
                         <td>{{ pred.fixed_acidity }}</td>
                         <td>{{ pred.volatile_acidity }}</td>
@@ -63,12 +67,13 @@
                         <td>{{ pred.sulphates }}</td>
                         <td>{{ pred.alcohol }}</td>
                         <td>{{ pred.color }}</td>
-                        <td style="font-weight:bold; color:green;">
-                            {{ pred.predicted_quality if pred.predicted_quality else "N/A" }}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </table>
+                        <td class="highlight-quality">{{ pred.predicted_quality if pred.predicted_quality else "N/A" }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+
                 <p style="color:green;">📂 Output saved at: {{ predictions.output_path }}</p>
             {% else %}
                 <p style="color:orange;">⚠️ No predictions found in the response.</p>
