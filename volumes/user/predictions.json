@@ -1,0 +1,15 @@
+{
+    "message": "Predictions generated successfully.",
+    "output_path": "volumes/user/predictions.json",
+    "predictions_preview": [
+        {
+            "predicted_quality": 3
+        },
+        {
+            "predicted_quality": 3
+        },
+        {
+            "predicted_quality": 3
+        }
+    ]
+}
