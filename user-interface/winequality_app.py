@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, jsonify
-import os
 import pandas as pd
+import joblib
 import json
 import requests
+import os
 
 # Flask App Setup
 app = Flask(__name__, static_folder="static", template_folder="templates")
@@ -11,7 +12,7 @@ app = Flask(__name__, static_folder="static", template_folder="templates")
 USER_DIR = "/app/volumes/user"
 PREDICTIONS_PATH = os.path.join(USER_DIR, 'predictions.json')
 
-# Columns based on your 'cleaned_wine_quality.csv' training data
+# Columns based on 'cleaned_wine_quality.csv' training data
 TRAINING_COLUMNS = [
     'Sample', 'fixed_acidity', 'volatile_acidity', 'citric_acid', 
     'residual_sugar', 'chlorides', 'free_sulfur_dioxide', 
@@ -22,7 +23,7 @@ TRAINING_COLUMNS = [
 ##################################################
 # FUNCTION: RUN MODEL INFERENCE (Docker Direct Call)
 ##################################################
-def run_inference(df: pd.DataFrame):
+def run_inference(*args, **kwargs):
     """Trigger the model-inference container via Docker network (Direct API Call)."""
     try:
         response = requests.post("http://model-inference:5001/predict")
@@ -34,13 +35,7 @@ def run_inference(df: pd.DataFrame):
             with open(PREDICTIONS_PATH, 'w') as file:
                 json.dump(predictions, file, indent=4)
 
-            # Combine original input with predictions
-            if "predictions" in predictions:
-                df["Predicted Quality"] = predictions["predictions"]
-            else:
-                df["Predicted Quality"] = "N/A"
-
-            return {"status": "success", "table": df.to_dict(orient="records")}
+            return predictions
         else:
             return {"status": "error", "details": f"Model-inference error: {response.text}"}
 
@@ -57,30 +52,29 @@ def format_input_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
     # Reorder columns to match training
     df = df[[col for col in TRAINING_COLUMNS if col in df.columns]]
-
     return df
 
 ##################################################
 # ROUTES
 ##################################################
 
-# 1. HOME PAGE
+# 1️⃣ HOME PAGE
 @app.route('/')
 def home():
     return render_template('index.html')
 
-# 2. CSV UPLOAD PAGE
+# 2️⃣ CSV UPLOAD PAGE
 @app.route('/model_pred_csv')
 def model_pred_csv():
     return render_template('model_pred_csv.html')
 
-# 3. MANUAL INPUT PAGE
+# 3️⃣ MANUAL INPUT PAGE
 @app.route('/model_pred_manual')
 def model_pred_manual():
     return render_template('model_pred_manual.html')
 
 ##################################################
-# 4. CSV UPLOAD HANDLING
+# 4️⃣ CSV UPLOAD HANDLING
 ##################################################
 @app.route('/upload_csv', methods=['POST'])
 def upload_csv():
@@ -102,20 +96,16 @@ def upload_csv():
         df.to_csv(input_csv_path, index=False)
         df.to_csv(os.path.join(USER_DIR, 'cleaned_input.csv'), index=False)
 
-        # Run inference
-        inference_response = run_inference(df)
+        # ✅ Run Inference
+        inference_response = run_inference()
 
-        return render_template(
-            'model_pred_csv.html', 
-            predictions=inference_response.get("table", []),
-            error=inference_response.get("details")
-        )
+        return render_template('model_pred_csv.html', predictions=inference_response)
 
     except Exception as e:
         return str(e), 500
 
 ##################################################
-# 5. MANUAL INPUT HANDLING
+# 5️⃣ MANUAL INPUT HANDLING
 ##################################################
 @app.route('/predict_manual', methods=['POST'])
 def predict_manual():
@@ -137,28 +127,27 @@ def predict_manual():
             'color': [request.form.get('color')]
         }
 
+        # Create DataFrame
         df = pd.DataFrame(data)
+
+        # Format input to match training
         df = format_input_dataframe(df)
 
-        # Save CSV
+        # Save input.csv and cleaned_input.csv
         os.makedirs(USER_DIR, exist_ok=True)
         df.to_csv(os.path.join(USER_DIR, 'input.csv'), index=False)
         df.to_csv(os.path.join(USER_DIR, 'cleaned_input.csv'), index=False)
 
-        # Run inference
-        inference_response = run_inference(df)
+        # ✅ Run Inference
+        inference_response = run_inference()
 
-        return render_template(
-            'model_pred_manual.html',
-            predictions=inference_response.get("table", []),
-            error=inference_response.get("details")
-        )
+        return render_template('model_pred_manual.html', predictions=inference_response)
 
     except Exception as e:
         return str(e), 500
-    
+
 ##################################################
-# FETCH PREDICTIONS (For API)
+# 6️⃣ FETCH PREDICTIONS (For API)
 ##################################################
 @app.route('/get_predictions', methods=['GET'])
 def get_predictions():
@@ -173,7 +162,7 @@ def get_predictions():
         return jsonify({"error": str(e)})
 
 ##################################################
-# START FLASK APP
+# 🟢 START FLASK APP
 ##################################################
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5003, debug=True)

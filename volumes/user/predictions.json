@@ -1,9 +1,22 @@
 {
     "message": "Predictions generated successfully.",
-    "output_path": "volumes/user/predictions.json",
+    "output_path": "/app/volumes/user/predictions.json",
     "predictions_preview": [
         {
-            "predicted_quality": 2
+            "Sample": 1,
+            "alcohol": 11.8,
+            "chlorides": 0.107,
+            "citric_acid": 0.64,
+            "color": 1,
+            "density": 0.9973,
+            "fixed_acidity": 10.5,
+            "free_sulfur_dioxide": 6,
+            "pH": 3.09,
+            "predicted_quality": 4,
+            "residual_sugar": 2.4,
+            "sulphates": 0.66,
+            "total_sulfur_dioxide": 15,
+            "volatile_acidity": 0.51
         }
     ]
 }

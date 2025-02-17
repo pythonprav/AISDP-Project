@@ -29,10 +29,6 @@ def predict():
         # Load Input CSV
         df = pd.read_csv(INPUT_PATH)
 
-        # Drop 'Sample' if exists (since model was trained without it)
-        if 'Sample' in df.columns:
-            df.drop(columns=['Sample'], inplace=True)
-
         # Make Predictions
         predictions = model.predict(df)
 
