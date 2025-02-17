@@ -29,11 +29,8 @@ spec:
           mountPath: /app/volumes/data
         - name: volumes-models
           mountPath: /app/volumes/models
-        env:
-        - name: KUBECONFIG
-          value: "/root/.kube/config"
         securityContext:
-          runAsUser: 0  # Run as root (required for Docker-in-Docker commands)
+          runAsUser: 0  # Root permissions required for Docker-in-Docker
       volumes:
       - name: volumes-user
         hostPath:
