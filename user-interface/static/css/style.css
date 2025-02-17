@@ -11,8 +11,8 @@
     width: 100%;
     height: 100%;
     font-family: "Helvetica Neue", Arial, sans-serif;
-    background-color: #f8f9fa; /* Light gray background */
-    color: #333;
+    background-color: #7b3c49; /* Light gray background */
+    color: #3b2020;
   }
   
   /* A container to limit width and center content */
@@ -26,7 +26,7 @@
   h1, h2, h3 {
     margin-bottom: 1rem;
     font-weight: 600;
-    color: #b1d8ff; /* Darker shade for headings */
+    color: #7d7e7e; /* Darker shade for headings */
   }
   
   /* Paragraphs */
@@ -48,8 +48,8 @@
   /* HEADER & NAV BAR */
   /* ---------------- */
   header {
-    background-color: #343a40; /* Darker background */
-    color: #fff;
+    background-color: #7b3c49; /* Darker background */
+    color: #3b2020;
     padding: 1rem 0;
     margin-bottom: 2rem;
   }
@@ -75,7 +75,7 @@
   /* -------------- */
   .btn {
     display: inline-block;
-    background-color: #007bff; /* Bootstrap-like blue */
+    color: #3b2020; /* Bootstrap-like blue */
     color: #fff;
     padding: 0.75rem 1.25rem;
     font-size: 1rem;
@@ -88,7 +88,7 @@
   }
   
   .btn:hover {
-    background-color: #0056b3; /* Darker blue on hover */
+    color: #241313;; /* Darker blue on hover */
   }
   
   /* -------------- */

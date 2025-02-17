@@ -22,7 +22,7 @@ TRAINING_COLUMNS = [
 ##################################################
 # FUNCTION: RUN MODEL INFERENCE (Docker Direct Call)
 ##################################################
-def run_inference():
+def run_inference(df: pd.DataFrame):
     """Trigger the model-inference container via Docker network (Direct API Call)."""
     try:
         response = requests.post("http://model-inference:5001/predict")
@@ -34,7 +34,13 @@ def run_inference():
             with open(PREDICTIONS_PATH, 'w') as file:
                 json.dump(predictions, file, indent=4)
 
-            return predictions
+            # Combine original input with predictions
+            if "predictions" in predictions:
+                df["Predicted Quality"] = predictions["predictions"]
+            else:
+                df["Predicted Quality"] = "N/A"
+
+            return {"status": "success", "table": df.to_dict(orient="records")}
         else:
             return {"status": "error", "details": f"Model-inference error: {response.text}"}
 
@@ -46,7 +52,6 @@ def run_inference():
 ##################################################
 def format_input_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """Ensure proper columns and order for the model."""
-    # Add 'Sample' column if missing
     if 'Sample' not in df.columns:
         df.insert(0, 'Sample', range(1, len(df) + 1))
 
@@ -97,9 +102,14 @@ def upload_csv():
         df.to_csv(input_csv_path, index=False)
         df.to_csv(os.path.join(USER_DIR, 'cleaned_input.csv'), index=False)
 
-        # Run inference and display results
-        inference_response = run_inference()
-        return render_template('model_pred_csv.html', predictions=inference_response)
+        # Run inference
+        inference_response = run_inference(df)
+
+        return render_template(
+            'model_pred_csv.html', 
+            predictions=inference_response.get("table", []),
+            error=inference_response.get("details")
+        )
 
     except Exception as e:
         return str(e), 500
@@ -127,38 +137,40 @@ def predict_manual():
             'color': [request.form.get('color')]
         }
 
-        # Create DataFrame
         df = pd.DataFrame(data)
-
-        # Format input to match training
         df = format_input_dataframe(df)
 
-        # Save input.csv and cleaned_input.csv
+        # Save CSV
         os.makedirs(USER_DIR, exist_ok=True)
         df.to_csv(os.path.join(USER_DIR, 'input.csv'), index=False)
         df.to_csv(os.path.join(USER_DIR, 'cleaned_input.csv'), index=False)
 
-        # Run inference and display results
-        inference_response = run_inference()
-        return render_template('model_pred_manual.html', predictions=inference_response)
+        # Run inference
+        inference_response = run_inference(df)
+
+        return render_template(
+            'model_pred_manual.html',
+            predictions=inference_response.get("table", []),
+            error=inference_response.get("details")
+        )
 
     except Exception as e:
         return str(e), 500
-
+    
 ##################################################
 # 6. FETCH PREDICTIONS (For API)
 ##################################################
-@app.route('/get_predictions', methods=['GET'])
-def get_predictions():
-    """Return predictions from predictions.json."""
-    try:
-        with open(PREDICTIONS_PATH, 'r') as file:
-            predictions = json.load(file)
-        return jsonify(predictions)
-    except FileNotFoundError:
-        return jsonify({"error": "Predictions file not found."})
-    except Exception as e:
-        return jsonify({"error": str(e)})
+# @app.route('/get_predictions', methods=['GET'])
+# def get_predictions():
+#     """Return predictions from predictions.json."""
+#     try:
+#         with open(PREDICTIONS_PATH, 'r') as file:
+#             predictions = json.load(file)
+#         return jsonify(predictions)
+#     except FileNotFoundError:
+#         return jsonify({"error": "Predictions file not found."})
+#     except Exception as e:
+#         return jsonify({"error": str(e)})
 
 ##################################################
 # START FLASK APP
