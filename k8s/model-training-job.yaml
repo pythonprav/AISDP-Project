@@ -1,0 +1,25 @@
+# k8s/model-training-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: model-training
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: model-training
+          image: pariikubavat/model-training:latest
+          volumeMounts:
+            - mountPath: /app/volumes/data
+              name: data-volume
+            - mountPath: /app/volumes/models
+              name: models-volume
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: data-volume-pvc
+        - name: models-volume
+          persistentVolumeClaim:
+            claimName: models-volume-pvc
+  backoffLimit: 4

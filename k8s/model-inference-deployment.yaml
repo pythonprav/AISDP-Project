@@ -13,19 +13,19 @@ spec:
         app: model-inference
     spec:
       containers:
-      - name: model-inference
-        image: pariikubavat/model-inference:latest
-        ports:
-        - containerPort: 5001
-        volumeMounts:
-        - mountPath: /app/volumes/models
-          name: models-volume
-        - mountPath: /app/volumes/user
-          name: user-volume
+        - name: model-inference
+          image: pariikubavat/model-inference:latest
+          ports:
+            - containerPort: 5001
+          volumeMounts:
+            - name: models-volume
+              mountPath: /app/volumes/models
+            - name: user-volume
+              mountPath: /app/volumes/user
       volumes:
-      - name: models-volume
-        persistentVolumeClaim:
-          claimName: models-volume-pvc
-      - name: user-volume
-        persistentVolumeClaim:
-          claimName: user-volume-pvc
+        - name: models-volume
+          persistentVolumeClaim:
+            claimName: models-volume-pvc
+        - name: user-volume
+          persistentVolumeClaim:
+            claimName: user-volume-pvc

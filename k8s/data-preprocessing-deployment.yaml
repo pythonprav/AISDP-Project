@@ -1,7 +1,10 @@
+# k8s/data-preprocessing-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: data-preprocessing
+  labels:
+    app: data-preprocessing
 spec:
   replicas: 1
   selector:
@@ -13,21 +16,38 @@ spec:
         app: data-preprocessing
     spec:
       containers:
-      - name: data-preprocessing
-        image: pariikubavat/data-preprocessing:latest
-        ports:
-        - containerPort: 5000
-        volumeMounts:
-        - mountPath: /app/data-preprocessing/raw_data
-          name: data-volume
-        - mountPath: /app/volumes/data
-          name: data-volume
-        - mountPath: /app/volumes/user
-          name: user-volume
+        - name: data-preprocessing
+          image: pariikubavat/data-preprocessing:latest
+          ports:
+            - containerPort: 5000
+          volumeMounts:
+            - mountPath: /app/data-preprocessing/raw_data
+              name: raw-data
+            - mountPath: /app/volumes/data
+              name: data-volume
+            - mountPath: /app/volumes/user
+              name: user-volume
       volumes:
-      - name: data-volume
-        persistentVolumeClaim:
-          claimName: data-volume-pvc
-      - name: user-volume
-        persistentVolumeClaim:
-          claimName: user-volume-pvc
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: data-volume-pvc
+        - name: user-volume
+          persistentVolumeClaim:
+            claimName: user-volume-pvc
+        - name: raw-data
+          hostPath:
+            path: /app/data-preprocessing/raw_data
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-preprocessing-service
+spec:
+  selector:
+    app: data-preprocessing
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+  type: ClusterIP

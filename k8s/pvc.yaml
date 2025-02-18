@@ -1,10 +1,11 @@
+# k8s/pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: data-volume-pvc
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
@@ -16,7 +17,7 @@ metadata:
   name: models-volume-pvc
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
@@ -28,7 +29,7 @@ metadata:
   name: user-volume-pvc
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
