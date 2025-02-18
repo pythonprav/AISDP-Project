@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: user-interface
+  labels:
+    app: user-interface
 spec:
   replicas: 1
   selector:
@@ -18,19 +20,23 @@ spec:
           ports:
             - containerPort: 5003
           volumeMounts:
-            - name: data-volume
-              mountPath: /app/volumes/data
-            - name: models-volume
-              mountPath: /app/volumes/models
-            - name: user-volume
-              mountPath: /app/volumes/user
+            - mountPath: /app/volumes/user
+              name: user-volume
+            - mountPath: /app/volumes/models
+              name: models-volume
+            - mountPath: /app/volumes/data
+              name: data-volume
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
       volumes:
-        - name: data-volume
-          persistentVolumeClaim:
-            claimName: data-volume-pvc
-        - name: models-volume
-          persistentVolumeClaim:
-            claimName: models-volume-pvc
         - name: user-volume
           persistentVolumeClaim:
             claimName: user-volume-pvc
+        - name: models-volume
+          persistentVolumeClaim:
+            claimName: models-volume-pvc
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: data-volume-pvc

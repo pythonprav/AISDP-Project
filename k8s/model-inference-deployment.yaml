@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: model-inference
+  labels:
+    app: model-inference
 spec:
   replicas: 1
   selector:
@@ -18,10 +20,14 @@ spec:
           ports:
             - containerPort: 5001
           volumeMounts:
-            - name: models-volume
-              mountPath: /app/volumes/models
-            - name: user-volume
-              mountPath: /app/volumes/user
+            - mountPath: /app/volumes/models
+              name: models-volume
+            - mountPath: /app/volumes/user
+              name: user-volume
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
       volumes:
         - name: models-volume
           persistentVolumeClaim:
