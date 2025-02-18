@@ -3,10 +3,7 @@ kind: Service
 metadata:
   name: user-interface-service
 spec:
+  ports:
+  - port: 5003
   selector:
     app: user-interface
-  ports:
-    - protocol: TCP
-      port: 5003
-      targetPort: 5003
-  type: ClusterIP

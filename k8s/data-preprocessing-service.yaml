@@ -3,10 +3,7 @@ kind: Service
 metadata:
   name: data-preprocessing-service
 spec:
+  ports:
+  - port: 5000
   selector:
     app: data-preprocessing
-  ports:
-    - protocol: TCP
-      port: 5000
-      targetPort: 5000
-  type: ClusterIP

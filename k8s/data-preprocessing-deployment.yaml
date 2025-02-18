@@ -18,9 +18,16 @@ spec:
         ports:
         - containerPort: 5000
         volumeMounts:
+        - mountPath: /app/data-preprocessing/raw_data
+          name: data-volume
         - mountPath: /app/volumes/data
           name: data-volume
+        - mountPath: /app/volumes/user
+          name: user-volume
       volumes:
       - name: data-volume
         persistentVolumeClaim:
           claimName: data-volume-pvc
+      - name: user-volume
+        persistentVolumeClaim:
+          claimName: user-volume-pvc
