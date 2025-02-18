@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-preprocessing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-preprocessing
+  template:
+    metadata:
+      labels:
+        app: data-preprocessing
+    spec:
+      containers:
+      - name: data-preprocessing
+        image: pariikubavat/data-preprocessing:latest
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - mountPath: /app/volumes/data
+          name: data-volume
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: data-volume-pvc
