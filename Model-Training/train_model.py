@@ -9,10 +9,8 @@ import os
 import logging
 
 # Load environment variables
-# TRAINING_FILE_PATH = os.getenv("TRAINING_FILE_PATH", "../Data/wine_quality_assignment.csv")
 TRAINING_FILE_PATH = os.getenv("TRAINING_FILE_PATH", "/app/data/wine_quality_assignment.csv")
-
-# SAVED_MODEL_DIR = os.getenv("SAVED_MODEL_PATH", "./saved_model")
+SAVED_MODEL_DIR = os.getenv("SAVED_MODEL_PATH", "./saved_model.pkl")
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
 # Load RandomForest parameters from environment variables
