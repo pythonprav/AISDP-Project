@@ -15,11 +15,8 @@ RF_MIN_SAMPLES_LEAF = 1
 RF_MAX_FEATURES = "sqrt"
 
 # File paths
-# DATA_PATH = "/app/volumes/data/cleaned_wine_quality.csv"
-# MODEL_PATH = "/app/volumes/models/saved_model.pkl"
-DATA_PATH = r"C:\Users\srira\OneDrive\Documents\GitHub\AISDP-Project\cleaned_wine_quality.csv"
-MODEL_PATH = r"C:\Users\srira\OneDrive\Documents\GitHub\AISDP-Project\saved_model.pkl"
-
+DATA_PATH = "/app/volumes/data/cleaned_wine_quality.csv"
+MODEL_PATH = "/app/volumes/models/saved_model.pkl"
 
 def load_data():
     """Load the cleaned dataset for model training."""
