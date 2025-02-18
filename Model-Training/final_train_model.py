@@ -59,7 +59,7 @@ def train_model():
         cv=3,  # 3-fold cross-validation
         scoring='accuracy',
         n_jobs=-1,
-        verbose=2
+        verbose=0
     )
     
     with contextlib.redirect_stdout(sys.stderr):  # Redirect standard output to avoid logs
