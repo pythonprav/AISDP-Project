@@ -14,5 +14,5 @@ COPY . .
 # Expose port for the API
 EXPOSE 5001
 
-# Run the model inference
+# Pass environment variables from Docker run command or Kubernetes
 CMD ["python3", "inference.py"]

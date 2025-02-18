@@ -14,5 +14,5 @@ COPY . .
 # Create necessary directories
 RUN mkdir -p /app/volumes/data /app/volumes/models
 
-# Set the command to run the training script
+# Pass environment variables from Docker run command or Kubernetes
 CMD ["python", "train_model.py"]

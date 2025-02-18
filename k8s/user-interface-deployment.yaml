@@ -15,28 +15,32 @@ spec:
         app: user-interface
     spec:
       containers:
-        - name: user-interface
-          image: pariikubavat/user-interface:latest
-          ports:
-            - containerPort: 5003
-          volumeMounts:
-            - mountPath: /app/volumes/user
-              name: user-volume
-            - mountPath: /app/volumes/models
-              name: models-volume
-            - mountPath: /app/volumes/data
-              name: data-volume
-          resources:
-            limits:
-              cpu: "500m"
-              memory: "512Mi"
-      volumes:
+      - name: user-interface
+        image: pariikubavat/user-interface:latest
+        ports:
+        - containerPort: 5003
+        env:  
+        - name: USER_DIR
+          value: "/app/volumes/user"
+        - name: INFERENCE_API
+          value: "http://model-inference-service:5001/predict"
+        volumeMounts:
         - name: user-volume
-          persistentVolumeClaim:
-            claimName: user-volume-pvc
-        - name: models-volume
-          persistentVolumeClaim:
-            claimName: models-volume-pvc
-        - name: data-volume
-          persistentVolumeClaim:
-            claimName: data-volume-pvc
+          mountPath: "/app/volumes/user"
+      volumes:
+      - name: user-volume
+        persistentVolumeClaim:
+          claimName: user-volume-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-interface-service
+spec:
+  selector:
+    app: user-interface
+  ports:
+    - protocol: TCP
+      port: 5003
+      targetPort: 5003
+  type: LoadBalancer

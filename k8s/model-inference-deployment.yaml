@@ -15,23 +15,39 @@ spec:
         app: model-inference
     spec:
       containers:
-        - name: model-inference
-          image: pariikubavat/model-inference:latest
-          ports:
-            - containerPort: 5001
-          volumeMounts:
-            - mountPath: /app/volumes/models
-              name: models-volume
-            - mountPath: /app/volumes/user
-              name: user-volume
-          resources:
-            limits:
-              cpu: "500m"
-              memory: "512Mi"
-      volumes:
+      - name: model-inference
+        image: pariikubavat/model-inference:latest
+        ports:
+        - containerPort: 5001
+        env:  
+        - name: MODEL_PATH
+          value: "/app/volumes/models/saved_model.pkl"
+        - name: INPUT_PATH
+          value: "/app/volumes/user/cleaned_input.csv"
+        - name: OUTPUT_PATH
+          value: "/app/volumes/user/predictions.json"
+        volumeMounts:
         - name: models-volume
-          persistentVolumeClaim:
-            claimName: models-volume-pvc
+          mountPath: "/app/volumes/models"
         - name: user-volume
-          persistentVolumeClaim:
-            claimName: user-volume-pvc
+          mountPath: "/app/volumes/user"
+      volumes:
+      - name: models-volume
+        persistentVolumeClaim:
+          claimName: models-volume-pvc
+      - name: user-volume
+        persistentVolumeClaim:
+          claimName: user-volume-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-inference-service
+spec:
+  selector:
+    app: model-inference
+  ports:
+    - protocol: TCP
+      port: 5001
+      targetPort: 5001
+  type: ClusterIP

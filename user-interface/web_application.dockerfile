@@ -10,8 +10,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Install docker.io for Docker commands
 RUN apt-get update && \
-    apt-get install -y docker.io curl && \
-    apt-get clean
+    apt-get install -y --no-install-recommends curl && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install kubectl for Kubernetes commands inside container
 RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \

@@ -2,8 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: data-preprocessing
-  labels:
-    app: data-preprocessing
 spec:
   replicas: 1
   selector:
@@ -15,23 +13,31 @@ spec:
         app: data-preprocessing
     spec:
       containers:
-        - name: data-preprocessing
-          image: pariikubavat/data-preprocessing:latest
-          ports:
-            - containerPort: 5000
-          volumeMounts:
-            - mountPath: /app/volumes/data
-              name: data-volume
-            - mountPath: /app/volumes/user
-              name: user-volume
-          resources:
-            limits:
-              cpu: "500m"
-              memory: "512Mi"
-      volumes:
+      - name: data-preprocessing
+        image: pariikubavat/data-preprocessing:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: RAW_DATA_DIR
+          value: "/app/raw_data"
+        - name: OUTPUT_DIR
+          value: "/app/volumes/data"
+        - name: USER_INPUTS_DIR
+          value: "/app/volumes/user"
+        volumeMounts:
+        - name: raw-data-volume
+          mountPath: "/app/raw_data"
         - name: data-volume
-          persistentVolumeClaim:
-            claimName: data-volume-pvc
+          mountPath: "/app/volumes/data"
         - name: user-volume
-          persistentVolumeClaim:
-            claimName: user-volume-pvc
+          mountPath: "/app/volumes/user"
+      volumes:
+      - name: raw-data-volume
+        persistentVolumeClaim:
+          claimName: raw-data-pvc
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: data-volume-pvc
+      - name: user-volume
+        persistentVolumeClaim:
+          claimName: user-volume-pvc

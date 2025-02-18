@@ -9,7 +9,9 @@ import os
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
 # Directory Paths
-USER_DIR = "/app/volumes/user"
+# Use environment variables for paths and endpoints
+USER_DIR = os.getenv("USER_DIR", "/app/volumes/user")
+INFERENCE_API = os.getenv("INFERENCE_API", "http://model-inference-service:5001/predict")
 PREDICTIONS_PATH = os.path.join(USER_DIR, 'predictions.json')
 
 # Columns based on 'cleaned_wine_quality.csv' training data
@@ -24,9 +26,9 @@ TRAINING_COLUMNS = [
 # FUNCTION: RUN MODEL INFERENCE (Docker Direct Call)
 ##################################################
 def run_inference(*args, **kwargs):
-    """Trigger the model-inference container via Docker network (Direct API Call)."""
+    """Trigger model-inference via environment-based endpoint."""
     try:
-        response = requests.post("http://model-inference:5001/predict")
+        response = requests.post(INFERENCE_API)  # ✅ Use environment variable
 
         if response.status_code == 200:
             predictions = response.json()

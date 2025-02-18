@@ -7,10 +7,10 @@ from sklearn.preprocessing import LabelEncoder
 
 app = Flask(__name__)
 
-# Directory paths
-RAW_DATA_DIR = "/app/data-preprocessing/raw_data"
-OUTPUT_DIR = "/app/volumes/data"
-USER_INPUTS_DIR = "/app/volumes/user"
+# Use environment variables for paths
+RAW_DATA_DIR = os.getenv("RAW_DATA_DIR", "/app/raw_data")
+OUTPUT_DIR = os.getenv("OUTPUT_DIR", "/app/volumes/data")
+USER_INPUTS_DIR = os.getenv("USER_INPUTS_DIR", "/app/volumes/user")
 
 # File paths
 INITIAL_CSV = os.path.join(RAW_DATA_DIR, "wine_quality_assignment.csv")

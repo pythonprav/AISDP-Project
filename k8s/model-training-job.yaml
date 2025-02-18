@@ -6,18 +6,23 @@ spec:
   template:
     spec:
       containers:
-        - name: model-training
-          image: pariikubavat/model-training:latest
-          volumeMounts:
-            - mountPath: /app/volumes/data
-              name: data-volume
-            - mountPath: /app/volumes/models
-              name: models-volume
+      - name: model-training
+        image: pariikubavat/model-training:latest
+        env: 
+        - name: DATA_PATH
+          value: "/app/volumes/data/cleaned_wine_quality.csv"
+        - name: MODEL_PATH
+          value: "/app/volumes/models/saved_model.pkl"
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/app/volumes/data"
+        - name: models-volume
+          mountPath: "/app/volumes/models"
       restartPolicy: Never
       volumes:
-        - name: data-volume
-          persistentVolumeClaim:
-            claimName: data-volume-pvc
-        - name: models-volume
-          persistentVolumeClaim:
-            claimName: models-volume-pvc
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: data-volume-pvc
+      - name: models-volume
+        persistentVolumeClaim:
+          claimName: models-volume-pvc

@@ -4,17 +4,22 @@ FROM python:3.9-slim
 # Set the working directory
 WORKDIR /app
 
-# Copy and install dependencies (optimized for caching)
+# Install curl (for health checks and testing inside container)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Copy and install dependencies
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all files into the container
+# Copy all files
 COPY . .
 
-# Create directories for persistent storage (inside container)
+# Create directories for volumes
 RUN mkdir -p /app/volumes/data /app/volumes/user
 
-# Expose the application port (needed for Flask API)
+# Expose port for Flask
 EXPOSE 5000
 
 # Default command to run Flask app

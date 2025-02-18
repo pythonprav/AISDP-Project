@@ -5,9 +5,9 @@ from sklearn.metrics import classification_report, accuracy_score
 import pickle
 import os
 
-# File paths
-DATA_PATH = "/app/volumes/data/cleaned_wine_quality.csv"
-MODEL_PATH = "/app/volumes/models/saved_model.pkl"
+# Use environment variables for paths
+DATA_PATH = os.getenv("DATA_PATH", "/app/volumes/data/cleaned_wine_quality.csv")
+MODEL_PATH = os.getenv("MODEL_PATH", "/app/volumes/models/saved_model.pkl")
 
 def load_data():
     """Load the cleaned dataset for model training."""
