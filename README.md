@@ -395,6 +395,7 @@ Key Features:
 - The UI retrieves and displays the predictions.
 
 ### Data Flow Diagram
+![alt text](image2.png)
 
 ### inference.py - The Prediction Script
 predict():
@@ -528,7 +529,7 @@ In a Kubernetes setup, the user-interface container is defined in:
 
 ### Data Flow Diagram
 
-![alt text](image-4.png)
+![alt text](image1.png)
 The UI container receives user inputs (CSV or manual), forwards them to the preprocessing container, then displays final predictions returned from the model inference container.
 
 ---
