@@ -8,7 +8,7 @@ spec:
       containers:
       - name: model-training
         image: pariikubavat/model-training:latest
-        env: 
+        env:
         - name: DATA_PATH
           value: "/app/volumes/data/cleaned_wine_quality.csv"
         - name: MODEL_PATH

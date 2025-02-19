@@ -5,7 +5,7 @@ import os
 
 app = Flask(__name__)
 
-# ✅ Use environment variables for paths
+# Use environment variables for paths
 MODEL_PATH = os.getenv("MODEL_PATH", "/app/volumes/models/saved_model.pkl")
 INPUT_PATH = os.getenv("INPUT_PATH", "/app/volumes/user/cleaned_input.csv")
 OUTPUT_PATH = os.getenv("OUTPUT_PATH", "/app/volumes/user/predictions.json")
