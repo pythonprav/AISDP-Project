@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-inference
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: model-inference
+  template:
+    metadata:
+      labels:
+        app: model-inference
+    spec:
+      containers:
+      - name: model-inference
+        image: pariikubavat/model-inference:latest
+        ports:
+        - containerPort: 5001
+        volumeMounts:
+        - name: wine-storage
+          mountPath: /app/volumes/user  # Reading cleaned_input.csv & saving predictions.json here
+        - name: wine-storage
+          mountPath: /app/volumes/models  # Reading saved_model.pkl from here
+      volumes:
+      - name: wine-storage
+        persistentVolumeClaim:
+          claimName: wine-pvc

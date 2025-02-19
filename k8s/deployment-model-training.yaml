@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-training
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: model-training
+  template:
+    metadata:
+      labels:
+        app: model-training
+    spec:
+      containers:
+      - name: model-training
+        image: pariikubavat/model-training:latest
+        volumeMounts:
+        - name: wine-storage
+          mountPath: /app/volumes/data  # Reading cleaned_wine_quality.csv from here
+        - name: wine-storage
+          mountPath: /app/volumes/models  # Saving saved_model.pkl here
+      volumes:
+      - name: wine-storage
+        persistentVolumeClaim:
+          claimName: wine-pvc

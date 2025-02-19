@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-interface
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-interface
+  template:
+    metadata:
+      labels:
+        app: user-interface
+    spec:
+      containers:
+      - name: user-interface
+        image: pariikubavat/user-interface:latest
+        ports:
+        - containerPort: 5003
+        volumeMounts:
+        - name: wine-storage
+          mountPath: /app/volumes/user  # Accessing cleaned_input.csv & predictions.json here
+      volumes:
+      - name: wine-storage
+        persistentVolumeClaim:
+          claimName: wine-pvc
