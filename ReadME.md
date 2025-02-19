@@ -51,12 +51,13 @@ AISDP-Project
 └── run.sh
 ```
 
+
 # **README: Wine Quality Prediction - Model Training Container**  
 
----
 
 ## **1. Overview**  
-The Wine Quality Prediction project uses a RandomForestClassifier to predict wine quality. The project is containerized with Docker for consistent environments and deployed using Kubernetes for scalability.
+The Wine Quality Prediction project uses a **RandomForestClassifier** to predict wine quality. The project is containerized with **Docker** for consistent environments and deployed using **Kubernetes** for scalability.
+
 ---
 
 ## **2. File Structure**  
@@ -74,68 +75,65 @@ model-training
 └── train_model.py                 # Core script for training the model
 ```
 
+---
+
 ## **3. Project Architecture**  
 
 1. **Data Loading:** The dataset `cleaned_wine_quality.csv` is loaded from `/data` using **pandas.read_csv()**.  
 2. **Data Splitting:** The dataset is split into training and testing sets using **train_test_split()** with an 80-20 split.  
-3. **Model Training:** A **RandomForestClassifier** is trained using **GridSearchCV** to optimize hyperparameters such as `n_estimators`, `max_depth`, `min_samples_split`, `min_samples_leaf`, and `max_features`.  
+3. **Model Training:** A **RandomForestClassifier** is trained using **GridSearchCV** to optimize hyperparameters.  
 4. **Performance Evaluation:** The model is evaluated using **accuracy_score** and **classification_report**.  
 5. **Model Saving:** The trained model is saved as `saved_model.pkl` in `/models` using **pickle.dump()**.  
 
 ---
 
 ## **4. Data Flow**  
-
-
 ![Image](https://github.com/user-attachments/assets/0e281b20-8855-4d4e-913d-7217fead78d6)
 
-- The dataset is loaded from **`/data/cleaned_wine_quality.csv`**.  
-- The trained model is saved in **`/models/saved_model.pkl`**.  
+- The dataset is loaded from `/data/cleaned_wine_quality.csv`.  
+- The trained model is saved in `/models/saved_model.pkl`.  
 
 ---
 
 ## **5. Features & Functionalities**  
 
-✅ **RandomForestClassifier:** Predicts wine quality using optimized hyperparameters.  
-✅ **GridSearchCV:** Performs hyperparameter tuning with cross-validation to find the best model configuration.  
-✅ **Docker Container:** Ensures a consistent environment for training the model.  
-✅ **Persistent Storage:** Stores input data and trained models in shared volumes for accessibility.  
-✅ **Kubernetes Deployment:** Automates the execution and scaling of the training container.  
+- **RandomForestClassifier:** Predicts wine quality using optimized hyperparameters.  
+- **GridSearchCV:** Performs hyperparameter tuning with cross-validation to find the best model configuration.  
+- **Docker Container:** Ensures a consistent environment for training the model.  
+- **Persistent Storage:** Stores input data and trained models in shared volumes for accessibility.  
+- **Kubernetes Deployment:** Automates the execution and scaling of the training container.  
 
 ---
 
 ## **6. Dependencies**  
 
-The following dependencies are listed in **`requirements.txt`**:  
+The following dependencies are listed in `requirements.txt`:  
 
-- **flask==3.0.0**: For potential API deployment.  
-- **pandas==2.1.0**: For loading and manipulating data.  
-- **numpy==1.26.0**: For numerical operations.  
-- **scikit-learn**: For machine learning and evaluation.  
-- **joblib**: For parallel processing during model training.  
+- **flask==3.0.0:** For potential API deployment.  
+- **pandas==2.1.0:** For loading and manipulating data.  
+- **numpy==1.26.0:** For numerical operations.  
+- **scikit-learn:** For machine learning and evaluation.  
+- **joblib:** For parallel processing during model training.  
 
 ---
 
 ## **7. Docker Implementation**  
 
 - **Dockerfile (model_training.dockerfile):**  
-  - The Dockerfile installs the dependencies listed in **`requirements.txt`**.  
-  - It copies the **`train_model.py`** script into the container and sets it as the entry point.  
-  - The working directory is set to `/app`, where the script is executed.  
+  - Installs the dependencies listed in `requirements.txt`.  
+  - Copies the `train_model.py` script into the container and sets it as the entry point.  
+  - Sets the working directory to `/app`, where the script is executed.  
 
 - **Volume Mounts:**  
-  - The **`/data`** folder is mounted to provide access to the input dataset.  
-  - The **`/models`** folder is mounted to save the trained model.  
+  - The `/data` folder is mounted to provide access to the input dataset.  
+  - The `/models` folder is mounted to save the trained model.  
 
 ### **Docker Workflow:**  
 1. **Build the Docker Image:**  
-   - The image is built using the command:  
    ```bash
    docker build -t model-training -f model_training.dockerfile .
    ```
-
 2. **Run the Docker Container:**  
-   - The container is executed using the command:  
    ```bash
    docker run --rm -v $(pwd)/data:/data -v $(pwd)/models:/models model-training
    ```
@@ -145,20 +143,19 @@ The following dependencies are listed in **`requirements.txt`**:
 ## **8. Kubernetes Deployment**  
 
 - **Deployment File (model-training-deployment.yaml):**  
-  - The deployment is configured as a Kubernetes **Job** that runs the container once and then terminates.  
+  - Configured as a Kubernetes **Job** that runs the container once and then terminates.  
   - Persistent volumes are mounted to ensure access to input data and output models.  
-  - Environment variables **`DATA_PATH`** and **`MODEL_PATH`** are used to specify file paths within the container.  
+  - Environment variables `DATA_PATH` and `MODEL_PATH` specify file paths within the container.  
 
 ### **Volume Mounts:**  
-- The `/data` volume provides access to **`cleaned_wine_quality.csv`**.  
-- The `/models` volume is used to save **`saved_model.pkl`**.  
+- `/data` provides access to `cleaned_wine_quality.csv`.  
+- `/models` is used to save `saved_model.pkl`.  
 
 ### **Kubernetes Workflow:**  
 1. **Apply the Deployment File:**  
    ```bash
    kubectl apply -f k8s/model-training-deployment.yaml
    ```
-
 2. **Monitor the Job Logs:**  
    ```bash
    kubectl logs job/model-training
@@ -170,28 +167,19 @@ The following dependencies are listed in **`requirements.txt`**:
 
 ![Image](https://github.com/user-attachments/assets/6e2479e5-4503-4b2d-b39d-bb835dec6ae5)
 
-The **`train_model.py`** script is responsible for the entire model training process. It performs the following steps:
+
+The `train_model.py` script handles the model training process:
 
 1. **Load Data:**  
-   - The script reads the dataset from `/data/cleaned_wine_quality.csv` using **pandas.read_csv()**.
-
+   - Reads the dataset from `/data/cleaned_wine_quality.csv` using **pandas.read_csv()**.
 2. **Data Splitting:**  
-   - The dataset is split into training and testing sets using **train_test_split()** with an 80-20 split and `random_state=42` for reproducibility.
-
+   - Splits the dataset into training and testing sets using **train_test_split()** with an 80-20 split and `random_state=42` for reproducibility.
 3. **Model Training:**  
-   - A **RandomForestClassifier** is trained using **GridSearchCV** to optimize the following hyperparameters:  
-     - `n_estimators`: 100, 150  
-     - `max_depth`: 20, None  
-     - `min_samples_split`: 2, 4  
-     - `min_samples_leaf`: 1, 2  
-     - `max_features`: 'sqrt', 'log2'  
-
+   - Trains a **RandomForestClassifier** using **GridSearchCV** to optimize hyperparameters.
 4. **Performance Evaluation:**  
-   - The model is evaluated using **accuracy_score** and **classification_report**.  
-   - The classification report includes precision, recall, and F1-score for each class.
-
+   - Evaluates the model using **accuracy_score** and **classification_report**.
 5. **Save Model:**  
-   - The trained model is saved as **`saved_model.pkl`** in the `/models` folder using **pickle.dump()**.
+   - Saves the trained model as `saved_model.pkl` in the `/models` folder using **pickle.dump()**.
 
 ---
 
@@ -200,10 +188,8 @@ The **`train_model.py`** script is responsible for the entire model training pro
 1. **Persistent Volumes:**  
    - The `/data` volume stores the input dataset, making it accessible to the training script.  
    - The `/models` volume stores the trained model, ensuring it is available even after the container stops.
-
 2. **Volume Mounts:**  
    - The host system's `/data` and `/models` folders are mounted inside the container for seamless data access.
-
 3. **Environment Variables:**  
    - `DATA_PATH` specifies the location of the input dataset: `/data/cleaned_wine_quality.csv`.  
    - `MODEL_PATH` specifies the location to save the trained model: `/models/saved_model.pkl`.
@@ -232,15 +218,14 @@ The **`train_model.py`** script is responsible for the entire model training pro
 - **Weighted Average:** Precision: 0.86, Recall: 0.87, F1-Score: 0.84  
 
 ### **Insights:**  
-- **Class 3** has the highest performance, with an F1-Score of **0.92** and Recall of **0.98**, indicating that the model is highly accurate in predicting this class.  
-- **Class 1** and **Class 2** have lower Recall, which may be due to the smaller number of samples (Support = 3 and 44, respectively).  
-- The **Weighted Average F1-Score** of **0.84** demonstrates that the model performs well overall, considering class imbalance.
+- **Class 3** has the highest performance, with an F1-Score of **0.92** and Recall of **0.98**.
+- **Class 1** and **Class 2** have lower Recall, likely due to the smaller number of samples (Support = 3 and 44, respectively).  
+- The **Weighted Average F1-Score** of **0.84** demonstrates strong overall model performance considering class imbalance.
 
 ---
 
-### Future Improvements: If there was more time and more project scope , I would like to implement my retrain code, and allows the users to directly edit the Training parameters directly from the UI  and create a button to train and create a display that shows the training metrics.
-
-
+### Future Improvements:
+If there were more time and scope, I would implement my retrain feature from my old code and allow users to edit training parameters directly from the UI, with a button to train and a window to display training metrics.
 
 
 
