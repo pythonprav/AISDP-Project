@@ -8,13 +8,14 @@ import os
 # Flask App Setup
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
-# Directory Paths
-# Use environment variables for paths and endpoints
+# Environment-aware API URL (Docker & Kubernetes)
+INFERENCE_API = os.getenv("INFERENCE_API", "http://localhost:5001/predict" if os.getenv("DOCKER_ENV") else "http://model-inference:5001/predict")
+
+# Environment-aware Storage Paths
 USER_DIR = os.getenv("USER_DIR", "/app/volumes/user")
-INFERENCE_API = os.getenv("INFERENCE_API", "http://model-inference-service:5001/predict")
 PREDICTIONS_PATH = os.path.join(USER_DIR, 'predictions.json')
 
-# Columns based on 'cleaned_wine_quality.csv' training data
+# Training Columns (Ensure order is consistent)
 TRAINING_COLUMNS = [
     'Sample', 'fixed_acidity', 'volatile_acidity', 'citric_acid', 
     'residual_sugar', 'chlorides', 'free_sulfur_dioxide', 
@@ -23,82 +24,88 @@ TRAINING_COLUMNS = [
 ]
 
 ##################################################
-# FUNCTION: RUN MODEL INFERENCE (Docker Direct Call)
+# FUNCTION: RUN MODEL INFERENCE
 ##################################################
-def run_inference(*args, **kwargs):
-    """Trigger model-inference via environment-based endpoint."""
+def run_inference():
+    """Trigger model-inference via HTTP request."""
     try:
-        response = requests.post(INFERENCE_API)  # ✅ Use environment variable
-
+        response = requests.post(INFERENCE_API)
+        
+        # Print Response to Debug
+        print(f"DEBUG: Inference API Response → {response.json()}")
         if response.status_code == 200:
             predictions = response.json()
 
-            # Save predictions to predictions.json
+            # Ensure JSON is saved correctly
             with open(PREDICTIONS_PATH, 'w') as file:
                 json.dump(predictions, file, indent=4)
-
             return predictions
-        else:
-            return {"status": "error", "details": f"Model-inference error: {response.text}"}
 
+        return {"status": "error", "details": response.text}
+    
     except Exception as e:
-        return {"status": "error", "details": f"Failed to connect to model-inference: {str(e)}"}
+        return {"status": "error", "details": f"Failed to connect to inference: {str(e)}"}
+
+##################################################
+# FUNCTION: SAFE FLOAT CONVERSION
+##################################################
+def safe_float(value):
+    """Convert value to float, return None if empty."""
+    try:
+        return float(value) if value.strip() else None
+    except ValueError:
+        return None
 
 ##################################################
 # FUNCTION: FORMAT INPUT DATA
 ##################################################
 def format_input_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-    """Ensure proper columns and order for the model."""
+    """Ensure proper column format."""
     if 'Sample' not in df.columns:
         df.insert(0, 'Sample', range(1, len(df) + 1))
-
-    # Reorder columns to match training
-    df = df[[col for col in TRAINING_COLUMNS if col in df.columns]]
-    return df
+    return df[[col for col in TRAINING_COLUMNS if col in df.columns]]
 
 ##################################################
 # ROUTES
 ##################################################
 
-# 1️⃣ HOME PAGE
+# HOME PAGE
 @app.route('/')
 def home():
     return render_template('index.html')
 
-# 2️⃣ CSV UPLOAD PAGE
+# CSV UPLOAD PAGE
 @app.route('/model_pred_csv')
 def model_pred_csv():
     return render_template('model_pred_csv.html')
 
-# 3️⃣ MANUAL INPUT PAGE
+# MANUAL INPUT PAGE
 @app.route('/model_pred_manual')
 def model_pred_manual():
     return render_template('model_pred_manual.html')
 
-##################################################
-# 4️⃣ CSV UPLOAD HANDLING
-##################################################
+# CSV UPLOAD HANDLING
 @app.route('/upload_csv', methods=['POST'])
 def upload_csv():
-    """Handle CSV upload and trigger inference."""
+    """Handle CSV upload & trigger inference."""
     try:
         file = request.files.get('csvFile')
         if not file:
             return "No file selected.", 400
 
-        # Save input.csv
+        # Ensure directory exists
         os.makedirs(USER_DIR, exist_ok=True)
         input_csv_path = os.path.join(USER_DIR, 'input.csv')
-        df = pd.read_csv(file)
 
-        # Format input to match training
+        # Read & format input
+        df = pd.read_csv(file)
         df = format_input_dataframe(df)
 
-        # Save input.csv and cleaned_input.csv
+        # Save files
         df.to_csv(input_csv_path, index=False)
         df.to_csv(os.path.join(USER_DIR, 'cleaned_input.csv'), index=False)
 
-        # ✅ Run Inference
+        # Run Inference
         inference_response = run_inference()
 
         return render_template('model_pred_csv.html', predictions=inference_response)
@@ -106,39 +113,33 @@ def upload_csv():
     except Exception as e:
         return str(e), 500
 
-##################################################
-# 5️⃣ MANUAL INPUT HANDLING
-##################################################
+# MANUAL INPUT HANDLING
 @app.route('/predict_manual', methods=['POST'])
 def predict_manual():
-    """Handle manual input and trigger inference."""
+    """Handle manual input & trigger inference."""
     try:
-        # Collect input from form
+        # Collect input with safe float conversion
         data = {
-            'fixed_acidity': [request.form.get('fixed_acidity')],
-            'volatile_acidity': [request.form.get('volatile_acidity')],
-            'citric_acid': [request.form.get('citric_acid')],
-            'residual_sugar': [request.form.get('residual_sugar')],
-            'chlorides': [request.form.get('chlorides')],
-            'free_sulfur_dioxide': [request.form.get('free_sulfur_dioxide')],
-            'total_sulfur_dioxide': [request.form.get('total_sulfur_dioxide')],
-            'density': [request.form.get('density')],
-            'pH': [request.form.get('pH')],
-            'sulphates': [request.form.get('sulphates')],
-            'alcohol': [request.form.get('alcohol')],
-            'color': [request.form.get('color')]
+            'fixed_acidity': [safe_float(request.form.get('fixed_acidity'))],
+            'volatile_acidity': [safe_float(request.form.get('volatile_acidity'))],
+            'citric_acid': [safe_float(request.form.get('citric_acid'))],
+            'residual_sugar': [safe_float(request.form.get('residual_sugar'))],
+            'chlorides': [safe_float(request.form.get('chlorides'))],
+            'free_sulfur_dioxide': [safe_float(request.form.get('free_sulfur_dioxide'))],
+            'total_sulfur_dioxide': [safe_float(request.form.get('total_sulfur_dioxide'))],
+            'density': [safe_float(request.form.get('density'))],
+            'pH': [safe_float(request.form.get('pH'))],
+            'sulphates': [safe_float(request.form.get('sulphates'))],
+            'alcohol': [safe_float(request.form.get('alcohol'))],
+            'color': [safe_float(request.form.get('color'))]
         }
 
-        # Create DataFrame
+        # Convert to DataFrame & format
         df = pd.DataFrame(data)
-
-        # Add Sample column (ensure it is first)
-        df.insert(0, 'Sample', range(1, len(df) + 1))  # This will add Sample as the first column
-
-        # Format input to match training
+        df.insert(0, 'Sample', range(1, len(df) + 1))
         df = format_input_dataframe(df)
 
-        # Save input.csv and cleaned_input.csv
+        # Save CSV
         os.makedirs(USER_DIR, exist_ok=True)
         df.to_csv(os.path.join(USER_DIR, 'input.csv'), index=False)
         df.to_csv(os.path.join(USER_DIR, 'cleaned_input.csv'), index=False)
@@ -151,12 +152,10 @@ def predict_manual():
     except Exception as e:
         return str(e), 500
 
-##################################################
-# 6️⃣ FETCH PREDICTIONS (For API)
-##################################################
+# FETCH PREDICTIONS (For UI)
 @app.route('/get_predictions', methods=['GET'])
 def get_predictions():
-    """Return predictions from predictions.json."""
+    """Return stored predictions."""
     try:
         with open(PREDICTIONS_PATH, 'r') as file:
             predictions = json.load(file)
@@ -167,7 +166,7 @@ def get_predictions():
         return jsonify({"error": str(e)})
 
 ##################################################
-# 🟢 START FLASK APP
+# START FLASK APP
 ##################################################
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5003, debug=True)

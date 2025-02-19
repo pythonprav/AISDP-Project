@@ -2,13 +2,14 @@ from flask import Flask, request, jsonify
 import pandas as pd
 import joblib
 import os
+import json
 
 app = Flask(__name__)
 
-# Define directories for Docker & Kubernetes
+# Directory
 BASE_DIR = "/mnt/data" if os.path.exists("/mnt/data") else "/app/volumes"
 
-# Define file paths 
+# File paths 
 MODEL_PATH = os.getenv("MODEL_PATH", os.path.join(BASE_DIR, "models/saved_model.pkl"))
 INPUT_PATH = os.getenv("INPUT_PATH", os.path.join(BASE_DIR, "user/cleaned_input.csv"))
 OUTPUT_PATH = os.getenv("OUTPUT_PATH", os.path.join(BASE_DIR, "user/predictions.json"))
@@ -27,37 +28,36 @@ def predict():
 
         # Validate Input Path
         if not os.path.exists(INPUT_PATH):
-            return jsonify({"error": f"Input file not found at {INPUT_PATH}", "suggestion": "Ensure user input has been processed"}), 400
+            return jsonify({"error": f"Input file not found at {INPUT_PATH}"}), 400
 
         # Load Input CSV
         df = pd.read_csv(INPUT_PATH)
-        
-        # Drop "quality" column if it exists (it should NOT be used for prediction)
-        if "quality" in df.columns:
-            df = df.drop(columns=["quality"])
-
-        # Ensure "Sample" column exists
-        if "Sample" not in df.columns:
-            df.insert(0, "Sample", range(1, len(df) + 1))
 
         # Make Predictions
         predictions = model.predict(df)
 
-        # Combine predictions with input features for detailed output
+        # Combine predictions with input features
         results = df.copy()
         results["predicted_quality"] = predictions
 
-        # I want to ensure that the output directory exists
-        os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+        print("🔍 DEBUG: Predictions DataFrame before saving:\n", results.head())
 
-        # Save predictions to JSON
-        results.to_json(OUTPUT_PATH, orient="records", indent=4)
+        # Save full predictions JSON structure
+        output_data = {
+            "message": "Predictions generated successfully.",
+            "output_path": OUTPUT_PATH,
+            "predictions_preview": results.to_dict(orient="records")
+            }
+        
+        # Write to file
+        with open(OUTPUT_PATH, 'w') as json_file:
+            json.dump(output_data, json_file, indent=4)
 
         # Return structured JSON for UI
         return jsonify({
             "message": "Predictions generated successfully.",
             "output_path": OUTPUT_PATH,
-            "predictions_preview": results.head().to_dict(orient="records")
+            "predictions_preview": results.head().to_dict(orient="records")  
         })
 
     except Exception as e:
