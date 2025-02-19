@@ -1,6 +1,6 @@
 
 AISDP-Project
-
+```plaintext
 ├── .pytest_cache
 ├── data-preprocessing
 │   ├── raw_data
@@ -49,14 +49,14 @@ AISDP-Project
 │       └── predictions.json
 └── README.md
 └── run.sh
+```
 
 # **README: Wine Quality Prediction - Model Training Container**  
 
 ---
 
 ## **1. Overview**  
-The Wine Quality Prediction project is designed to predict wine quality using a machine learning model trained with a **RandomForestClassifier**. The project is containerized using **Docker** for consistency and deployed using **Kubernetes** for scalability and reliability. The dataset is preprocessed and saved as `cleaned_wine_quality.csv` in the `/data` folder, and the trained model is saved as `saved_model.pkl` in the `/models` folder. Hyperparameter tuning is performed using **GridSearchCV** to optimize model performance. Persistent storage volumes ensure that input data and trained models are accessible even after the container stops.
-
+The Wine Quality Prediction project uses a RandomForestClassifier to predict wine quality. The project is containerized with Docker for consistent environments and deployed using Kubernetes for scalability.
 ---
 
 ## **2. File Structure**  
@@ -74,15 +74,6 @@ model-training
 └── train_model.py                 # Core script for training the model
 ```
 
-- **`data/cleaned_wine_quality.csv`**: The cleaned dataset used as input for model training.  
-- **`models/saved_model.pkl`**: The trained RandomForest model saved as a pickle file.  
-- **`k8s/model-training-deployment.yaml`**: Kubernetes deployment file that automates the execution of the model training container.  
-- **`model_training.dockerfile`**: Dockerfile that defines the container environment and ensures all dependencies are installed.  
-- **`requirements.txt`**: Lists the dependencies required for model training, including **pandas**, **numpy**, **scikit-learn**, and **joblib**.  
-- **`train_model.py`**: The core script responsible for loading the dataset, training the model, evaluating performance, and saving the trained model.
-
----
-
 ## **3. Project Architecture**  
 
 1. **Data Loading:** The dataset `cleaned_wine_quality.csv` is loaded from `/data` using **pandas.read_csv()**.  
@@ -95,21 +86,8 @@ model-training
 
 ## **4. Data Flow**  
 
-```plaintext
-           Input: data/cleaned_wine_quality.csv
-                      |
-                      v
-         +--------------------------------+
-         | train_model.py                 |
-         | - Loads dataset using pandas   |
-         | - Splits data into train/test  |
-         | - Trains RandomForest model    |
-         | - Saves model using pickle     |
-         +--------------------------------+
-                      |
-                      v
-           Output: models/saved_model.pkl
-```
+
+![Image](https://github.com/user-attachments/assets/0e281b20-8855-4d4e-913d-7217fead78d6)
 
 - The dataset is loaded from **`/data/cleaned_wine_quality.csv`**.  
 - The trained model is saved in **`/models/saved_model.pkl`**.  
@@ -190,6 +168,8 @@ The following dependencies are listed in **`requirements.txt`**:
 
 ## **9. Model Training Process (train_model.py)**  
 
+![Image](https://github.com/user-attachments/assets/6e2479e5-4503-4b2d-b39d-bb835dec6ae5)
+
 The **`train_model.py`** script is responsible for the entire model training process. It performs the following steps:
 
 1. **Load Data:**  
@@ -258,9 +238,10 @@ The **`train_model.py`** script is responsible for the entire model training pro
 
 ---
 
-## **12. Conclusion**  
+### Future Improvements: If there was more time and more project scope , I would like to implement my retrain code, and allows the users to directly edit the Training parameters directly from the UI  and create a button to train and create a display that shows the training metrics.
 
-The Wine Quality Prediction project successfully automates the training process using a **RandomForestClassifier** with hyperparameter tuning. The combination of **Docker** and **Kubernetes** ensures that the training process is consistent, scalable, and reliable. Input data is loaded from **`/data/cleaned_wine_quality.csv`**, and the trained model is saved as **`/models/saved_model.pkl`**. Using **Persistent Volumes**, both the input data and trained model remain accessible even after the container stops, making this pipeline suitable for production use.
+
+
 
 
 
