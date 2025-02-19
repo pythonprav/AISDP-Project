@@ -1,5 +1,4 @@
-# chmod +x docker_run.sh
-# ./docker_run.sh
+# bash docker_run.sh
 
 echo "Stopping and removing any existing containers..."
 docker stop data-preprocessing model-training model-inference user-interface 2>/dev/null
