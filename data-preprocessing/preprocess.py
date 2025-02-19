@@ -8,9 +8,9 @@ from sklearn.preprocessing import LabelEncoder
 app = Flask(__name__)
 
 # Use environment variables for paths (For Docker & Kubernetes compatibility)
-RAW_DATA_DIR = os.getenv("RAW_DATA_DIR", "/app/raw_data")
-OUTPUT_DIR = os.getenv("OUTPUT_DIR", "/app/volumes/data")
-USER_INPUTS_DIR = os.getenv("USER_INPUTS_DIR", "/app/volumes/user")
+RAW_DATA_DIR = os.getenv("RAW_DATA_DIR", "/mnt/data/raw_data" if os.path.exists("/mnt/data") else "/app/raw_data")
+OUTPUT_DIR = os.getenv("OUTPUT_DIR", "/mnt/data/processed_data" if os.path.exists("/mnt/data") else "/app/volumes/data")
+USER_INPUTS_DIR = os.getenv("USER_INPUTS_DIR", "/mnt/data/user_inputs" if os.path.exists("/mnt/data") else "/app/volumes/user")
 
 # File paths
 INITIAL_CSV = os.path.join(RAW_DATA_DIR, "wine_quality_assignment.csv")
