@@ -17,10 +17,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Create directories for volumes
-RUN mkdir -p /app/volumes/data /app/volumes/user
+RUN mkdir -p /app/raw_data /app/volumes/data /app/volumes/user
 
 # Expose port for Flask
-EXPOSE 5000
+EXPOSE 5004
 
 # Default command to run Flask app
 CMD ["python", "preprocess.py"]
