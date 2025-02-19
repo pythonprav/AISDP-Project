@@ -50,6 +50,11 @@ AISDP-Project
 └── README.md
 └── run.sh
 ```
+Group: EGT309-T2
+Project Team: Team Harvard
+GitHub Repository: https://github.com/pythonprav/AISDP-Project
+
+Team Members:
 
 
 # **README: Wine Quality Prediction - Model Training Container**  
