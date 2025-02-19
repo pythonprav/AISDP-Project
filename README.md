@@ -1,5 +1,5 @@
 # **EGT309 AI Solution Development Project: Team Harvard**
-GitHub Repository: https://github.com/pythonprav/AISDP-Project
+GitHub Repository: [https://github.com](https://github.com/pythonprav/AISDP-Project/tree/parii-branch)
 
 ## Project: Determine Wine Quality
 This project is a Kubernetes-based machine learning system to determine wine quality in a fully containerized enviornment with persistent storage, as well as a user-friendly web interface
@@ -353,6 +353,17 @@ If there were more time and scope, I would implement my retrain feature from my 
 
 
 ## Model Inference Container (model-inference)
+
+###  Overview
+The Model Inference Container is responsible for making wine quality predictions using the trained model (saved_model.pkl). It receives a cleaned user input CSV, processes it, and generates predictions.json, which the User Interface (UI) retrieves to display the results.
+
+Key Features:
+✔ Uses the trained model to make predictions.
+✔ Reads user input from cleaned_input.csv.
+✔ Saves predictions in predictions.json.
+✔ Deployable via Docker & Kubernetes.
+✔ Communicates with User Interface through API calls.
+
 ### File Structure
 ```plaintext
 ├── model-inference
@@ -363,3 +374,209 @@ If there were more time and scope, I would implement my retrain feature from my 
 │   ├── user-interface-deployment.yaml
 │   └── user-interface-service.yaml
 ```
+
+**Key Files**
+- inference.py → Flask API to handle inference requests.
+- model_inference.dockerfile → Dockerfile for containerization.
+- requirements.txt → Python dependencies.
+- volumes/models/ → Stores saved_model.pkl.
+- volumes/user/ → Stores user inputs (cleaned_input.csv) and predictions (predictions.json).
+
+### Model Inference Workflow
+(1) User uploads data via the UI
+- The uploaded CSV is preprocessed and saved as cleaned_input.csv in /app/volumes/user/.
+
+(2) Model Inference is triggered
+- The API (/predict) reads cleaned_input.csv and loads the trained model.
+- The model predicts the wine quality for each input row.
+
+(3) Predictions are stored
+- The results are saved as JSON in /app/volumes/user/predictions.json.
+- The UI retrieves and displays the predictions.
+
+### Data Flow Diagram
+
+### inference.py - The Prediction Script
+predict():
+- loads saved_model.pkl
+- Reads cleaned_input.csv
+- Makes predictions
+- Saves results to predictions.json
+- Returns a preview of the predictions
+
+Code Snippet:
+
+```plaintext
+@app.route('/predict', methods=['POST'])
+def predict():
+    try:
+        if not os.path.exists(MODEL_PATH):
+            return jsonify({"error": f"Model file not found at {MODEL_PATH}"}), 500
+
+        model = joblib.load(MODEL_PATH)
+
+        if not os.path.exists(INPUT_PATH):
+            return jsonify({"error": f"Input file not found at {INPUT_PATH}"}), 400
+
+        df = pd.read_csv(INPUT_PATH)
+        predictions = model.predict(df)
+
+        results = df.copy()
+        results["predicted_quality"] = predictions
+
+        output_data = {
+            "message": "Predictions generated successfully.",
+            "output_path": OUTPUT_PATH,
+            "predictions_preview": results.to_dict(orient="records")
+        }
+
+        with open(OUTPUT_PATH, 'w') as json_file:
+            json.dump(output_data, json_file, indent=4)
+
+        return jsonify(output_data)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+```
+
+### Docker File 
+**Building & Running Locally**
+```plaintext
+cd model-inference
+docker build -t pariikubavat/model-inference:latest -f model_inference.dockerfile .
+docker run -p 5001:5001 -v $(pwd)/volumes:/app/volumes pariikubavat/model-inference
+```
+
+### Kubernetes Deployment
+
+```plaintext
+kubectl apply -f k8s/deployment-model-inference.yaml
+kubectl apply -f k8s/service-model-inference.yaml
+```
+
+```plaintext
+kubectl logs $(kubectl get pods --selector=app=model-inference -o=jsonpath='{.items[0].metadata.name}')
+```
+
+```plaintext
+kubectl port-forward service/model-inference 5001:5001 &
+```
+
+```plaintext
+curl -X POST http://localhost:5001/predict
+```
+
+### Future Improvements and Summary
+
+Enhancements:
+- Enable batch prediction for multiple files
+- Implement auto-retraining based on new user data
+- Improve error handling for incorrect input formats
+
+Long-Term Goals:
+- Deploy as a serverless API on AWS Lambda.
+- Implement real-time inference using Kafka streaming
+
+Model Inference Container automates wine quality predictions.
+Runs as a Flask API inside Docker & Kubernetes.
+Stores user input, model, and predictions in shared volumes.
+Supports real-time inference with a REST API.
+
+## User Interface Container (user-interface)
+
+### Overview
+The user-interface container provides a front-end experience for uploading wine data and retrieving predictions. It runs a Flask application that serves HTML templates, handles form submissions (CSV or manual input), and routes this data to the backend for processing. By containerizing the UI, the application can be deployed consistently and scaled in a Kubernetes environment.
+
+---
+
+### File Structure
+
+user-interface/
+├─ templates/
+│  ├─ index.html
+│  ├─ model_pred_csv.html
+│  ├─ model_pred_manual.html
+├─ static/
+│  └─ css/
+│     └─ style.css
+├─ winequality_app.py
+├─ web_application.dockerfile
+└─ requirements.txt
+
+
+- **templates/index.html** – Landing page to choose between CSV upload or manual input  
+- **templates/model_pred_csv.html** – UI for uploading CSV files  
+- **templates/model_pred_manual.html** – UI for manual input of wine features  
+- **winequality_app.py** – Main Flask application handling routes and logic for user interaction  
+- **web_application.dockerfile** – Dockerfile for building the user-interface container  
+- **requirements.txt** – Python dependencies needed by the Flask app  
+
+---
+
+### Project Architecture
+
+In a Kubernetes setup, the user-interface container is defined in:
+- **user-interface-deployment.yaml** – Manages replicas, volume mounts, and container settings  
+- **user-interface-service.yaml** – Exposes port 5003 so other components or end-users can access the UI  
+
+**Volume Mounts**  
+- `/app/volumes/user` – Used to store user uploads (e.g., CSV files)  
+- `/app/volumes/data` – Contains processed data passed between different containers  
+- `/app/volumes/models` – Stores trained model files or other resources needed by the pipeline  
+
+---
+
+### Data Flow Diagram
+
+![alt text](image-4.png)
+The UI container receives user inputs (CSV or manual), forwards them to the preprocessing container, then displays final predictions returned from the model inference container.
+
+---
+
+### Features & Functionalities
+
+**Main UI Functions**  
+- **CSV Upload Page (`model_pred_csv.html`)**  
+  - Allows users to upload a CSV file containing wine features.  
+  - Data is forwarded via the `/upload_csv` route in `winequality_app.py`.  
+- **Manual Input Page (`model_pred_manual.html`)**  
+  - Accepts wine characteristics through a form.  
+  - Data is sent via the `/predict_manual` route for processing.
+
+**User Input Methods**  
+1. **CSV Input**  
+   - Users select and upload a CSV. The UI sends this file to the backend, which then stores it in `/app/volumes/user`.  
+2. **Manual Input**  
+   - Users enter individual features (fixed acidity, pH, etc.).  
+   - The form data is packaged into a small DataFrame, also persisted in `/app/volumes/user` or `/app/volumes/data`.  
+
+**UI Output**  
+- Displays the predicted wine quality on-screen (e.g., “Predicted Quality: 4”).  
+- Shows any error messages or processing steps to guide users.
+
+---
+
+### `winequality_app.py`
+
+Flask app providing the main routes:
+
+- **`/`** – Renders the landing page (`index.html`).  
+- **`/run_inference`** - Calls the model_inference container
+- **`/model_pred_csv`** – Renders the CSV upload page.  
+- **`/upload_csv`** *(POST)* – Receives CSV uploads, triggers data-preprocessing, then returns results.  
+- **`/model_pred_manual`** – Renders the manual input page.  
+- **`/predict_manual`** *(POST)* – Handles form submissions, triggers data-preprocessing, and displays predictions.
+
+The app also integrates with other containers (data preprocessing and model inference) by making API calls within these routes.
+
+---
+
+### `web_application.dockerfile`
+
+- **Base Image:** `python:3.9-slim`  
+- **Installs Dependencies:** Uses `requirements.txt` to install Flask and other necessary packages.  
+- **Sets Up Flask Application:** Copies the application files (HTML templates, static assets, `winequality_app.py`) into the container.  
+- **Exposes Port 5003:** So that the Kubernetes service can route traffic to the UI.  
+- **Launch Command:** Uses `python winequality_app.py` to start the Flask server.
+
+This container ensures that the UI is packaged and deployed consistently, enabling scalable and reliable access to the wine quality prediction workflow.
