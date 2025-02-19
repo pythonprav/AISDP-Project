@@ -16,7 +16,7 @@ spec:
       - name: data-preprocessing
         image: pariikubavat/data-preprocessing:latest
         ports:
-        - containerPort: 5000
+        - containerPort: 5004
         env:
         - name: RAW_DATA_DIR
           value: "/app/raw_data"
