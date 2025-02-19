@@ -14,9 +14,14 @@ RF_MIN_SAMPLES_SPLIT = 2
 RF_MIN_SAMPLES_LEAF = 1
 RF_MAX_FEATURES = "sqrt"
 
+# Use environment variables for paths (For Docker & Kubernetes compatibility)
+DATA_DIR = os.getenv("DATA_DIR", "/mnt/data/processed_data" if os.path.exists("/mnt/data") else "/app/volumes/data")
+MODEL_DIR = os.getenv("MODEL_DIR", "/mnt/data/models" if os.path.exists("/mnt/data") else "/app/volumes/models")
+
 # File paths
-DATA_PATH = "/app/volumes/data/cleaned_wine_quality.csv"
-MODEL_PATH = "/app/volumes/models/saved_model.pkl"
+DATA_PATH = os.path.join(DATA_DIR, "cleaned_wine_quality.csv")
+MODEL_PATH = os.path.join(MODEL_DIR, "saved_model.pkl")
+TRAINING_LOG = os.path.join(MODEL_DIR, "training_log.txt")
 
 def load_data():
     """Load the cleaned dataset for model training."""
