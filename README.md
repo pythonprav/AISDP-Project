@@ -1,4 +1,5 @@
-# **EGT309 AI Solution Development Project**
+# **EGT309 AI Solution Development Project: Team Harvard**
+
 
 ## Project: Determine Wine Quality
 This project is a Kubernetes-based machine learning system to determine wine quality in a fully containerized enviornment with persistent storage, as well as a user-friendly web interface
@@ -6,170 +7,113 @@ This project is a Kubernetes-based machine learning system to determine wine qua
 ## System Architecture
 - Data Preprocessing: Cleans & Transform raw data
 - Model Training: Trains a predictive model using Machine Learning
-- Model Inference: use the trained model to make predictions
-- User Interface: web application for user to interact
+- Model Inference: Uses the trained model + UI cleaned input csv to make wine quality predictions
+- User Interface: Web application for user to interact
 
+## System Workflow
+**PHASE 1: MODEL PREPARATION**
+
+Data Preprocessing:
+- Input: wine_quality_assignment.csv
+- Output: cleaned_wine_quality.csv, wine_quality.json
+
+Model Training: 
+-	Input: cleaned_wine_quality.csv
+-	Output: saved_model.pkl
+
+**PHASE 2: MODEL DEPLOYMENT & INFERENCE**
+User Interface
+-	User uploads: input.csv
+  
+Data Preprocessing (User Input)
+	•	Input: input.csv
+	•	Output: cleaned_input.csv
+
+Model Inference
+-	Input: cleaned_input.csv, saved_model.pkl
+-	Output: predictions.json
+
+User Interface (Results Display)
+- Display predictions.json
+ 
 ## Deployment Containers & Services
 
 ### Data Preprocessing
 - Description: Clean and transform raw CSV data
-- Deployment YAML: data-preprocessing-deployment.yaml
-- Service YAML: data-preprocessing-servicce.yaml
+- Deployment YAML: deployment-data-preprocessing.yaml
+- Service YAML: service-data-preprocessing.yaml
 
 ### Model Training
 - Description: Train ML model using cleaned data
-- Deployment YAML: model-training-deployment.yaml
-- Service YAML: N/A
+- Deployment YAML: deployment-model-training.yaml
+- Service YAML: service-model-training.yaml
 
 ### Model Inference
 - Description: Used trained model to predict wine quality
-- Deployment YAML: model-inference-deployment.yaml
-- Service YAML: model-inference-service.yaml
+- Deployment YAML: deployment-model-inference.yaml
+- Service YAML: service-model-inference.yaml
 
 ### User Interface:
 - Description: Provides an interactive web app
-- Deployment YAML: user-interface-deployment.yaml
-- Service YAML: user-interface-service.yaml
+- Deployment YAML: deployment-user-interface.yaml
+- Service YAML: service-user-interface.yaml
 
 ## File Structure
-📦AISDP-Project
-
-┣ 📂.github
-
- ┃ ┗ 📂workflows
-
- ┣ 📂backup data
-
- ┣ 📂data-preprocessing
-
- ┃ ┣ 📂data
-
- ┃ ┣ 📂raw_data
-
- ┃ ┃ ┗ 📜wine_quality_assignment.csv
-
- ┃ ┣ 📂__pycache__
-
- ┃ ┣ 📜data_preprocessing.dockerfile
-
- ┃ ┣ 📜preprocess.py
-
- ┃ ┗ 📜requirements.txt
-
- ┣ 📂k8s
-
- ┃ ┣ 📜data-preprocessing-deployment.yaml
-
- ┃ ┣ 📜data-preprocessing-service.yaml
-
- ┃ ┣ 📜model-inference-deployment.yaml
-
- ┃ ┣ 📜model-inference-service.yaml
-
- ┃ ┣ 📜model-training-deployment.yaml
-
- ┃ ┣ 📜pvc.yaml
-
- ┃ ┣ 📜raw-data-pvc.yaml
-
- ┃ ┣ 📜user-interface-deployment.yaml
-
- ┃ ┗ 📜user-interface-service.yaml
-
- ┣ 📂kubernetes
-
- ┣ 📂mnt
-
- ┃ ┣ 📂models
-
- ┃ ┣ 📂raw_data
-
- ┃ ┗ 📂user
-
- ┣ 📂model-inference
-
- ┃ ┣ 📜inference.py
-
- ┃ ┣ 📜model_inference.dockerfile
-
- ┃ ┗ 📜requirements.txt
-
- ┣ 📂Model-Training
-
- ┃ ┣ 📂redundant
-
- ┃ ┣ 📜model_training.dockerfile
-
- ┃ ┣ 📜requirements.txt
-
- ┃ ┗ 📜train_model.py
-
- ┣ 📂raw_data
-
- ┣ 📂user-interface
-
- ┃ ┣ 📂assets
-
- ┃ ┃ ┣ 📂css
-
- ┃ ┃ ┗ 📂js
-
- ┃ ┣ 📂static
-
- ┃ ┃ ┣ 📂css
-
- ┃ ┃ ┃ ┗ 📜style.css
-
- ┃ ┃ ┗ 📂js
-
- ┃ ┃ ┃ ┗ 📜script.js
-
- ┃ ┣ 📂templates
-
- ┃ ┃ ┣ 📜index.html
-
- ┃ ┃ ┣ 📜model_pred_csv.html
-
- ┃ ┃ ┗ 📜model_pred_manual.html
-
- ┃ ┣ 📜requirements.txt
-
- ┃ ┣ 📜web_application.dockerfile
-
- ┃ ┗ 📜winequality_app.py
-
- ┣ 📂volumes
-
- ┃ ┣ 📂data
-
- ┃ ┃ ┣ 📜.DS_Store
-
- ┃ ┃ ┣ 📜cleaned_wine_quality.csv
-
- ┃ ┃ ┗ 📜wine_quality.json
-
- ┃ ┣ 📂models
-
- ┃ ┃ ┗ 📜saved_model.pkl
-
- ┃ ┣ 📂user
-
- ┃ ┃ ┣ 📜cleaned_input.csv
-
- ┃ ┃ ┣ 📜input.csv
-
- ┃ ┃ ┗ 📜predictions.json
-
- ┃ ┣ 📂userinput
-
- ┃ ┗ 📜.DS_Store
-
- ┣ 📜.DS_Store
-
- ┣ 📜REAME.md
-
- ┗ 📜run.sh
- 
+```plaintext
+.
+├── data-preprocessing
+│   ├── data_preprocessing.dockerfile
+│   ├── preprocess.py
+│   ├── raw_data
+│   │   └── wine_quality_assignment.csv
+│   └── requirements.txt
+├── k8s
+│   ├── deployment-data-preprocessing.yaml
+│   ├── deployment-model-inference.yaml
+│   ├── deployment-model-training.yaml
+│   ├── deployment-user-interface.yaml
+│   ├── pvc.yaml
+│   ├── service-data-preprocessing.yaml
+│   ├── service-model-inference.yaml
+│   ├── service-model-training.yaml
+│   └── service-user-interface.yaml
+├── model-inference
+│   ├── inference.py
+│   ├── model_inference.dockerfile
+│   ├── requirements.txt
+│   └── volumes
+│       ├── models
+│       └── user
+├── model-training
+│   ├── model_training.dockerfile
+│   ├── requirements.txt
+│   └── train_model.py
+├── run.sh
+├── setup_storage.sh
+├── user-interface
+│   ├── requirements.txt
+│   ├── static
+│   │   ├── css
+│   │   │   └── style.css
+│   │   └── js
+│   │       └── script.js
+│   ├── templates
+│   │   ├── index.html
+│   │   ├── model_pred_csv.html
+│   │   └── model_pred_manual.html
+│   ├── web_application.dockerfile
+│   └── winequality_app.py
+└── volumes
+    ├── data
+    │   ├── cleaned_wine_quality.csv
+    │   └── wine_quality.json
+    ├── models
+    │   └── saved_model.pkl
+    └── user
+        ├── cleaned_input.csv
+        ├── input.csv
+        └── predictions.json
+```
 
 ## Data Preprocessing Container (data-preprocessing)
 ### Overview
@@ -188,21 +132,14 @@ Steps:
 This container is important in ensuring quality and consistent data in this pipeline.
 
 ### File Structure
-┣ 📂data-preprocessing
-
-┃ ┣ 📂data
-
-┃ ┣ 📂raw_data
-
-┃ ┃ ┗ 📜wine_quality_assignment.csv
-
-┃ ┣ 📂__pycache__
-
-┃ ┣ 📜data_preprocessing.dockerfile
-
-┃ ┣ 📜preprocess.py
-
-┃ ┗ 📜requirements.txt
+```plaintext
+├── data-preprocessing
+│   ├── data_preprocessing.dockerfile
+│   ├── preprocess.py
+│   ├── raw_data
+│   │   └── wine_quality_assignment.csv
+│   └── requirements.txt
+```
 
 ### Project Architecture
 This section is deployed in a Kubernetes environment with the following configuration
