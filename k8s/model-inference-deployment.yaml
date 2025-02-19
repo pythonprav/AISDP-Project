@@ -2,8 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: model-inference
-  labels:
-    app: model-inference
 spec:
   replicas: 1
   selector:
@@ -18,36 +16,23 @@ spec:
       - name: model-inference
         image: pariikubavat/model-inference:latest
         ports:
-        - containerPort: 5001
-        env:  
-        - name: MODEL_PATH
-          value: "/app/volumes/models/saved_model.pkl"
-        - name: INPUT_PATH
-          value: "/app/volumes/user/cleaned_input.csv"
-        - name: OUTPUT_PATH
-          value: "/app/volumes/user/predictions.json"
+          - containerPort: 5001
+        env:
+          - name: MODEL_PATH
+            value: "/app/volumes/models/saved_model.pkl"
+          - name: INPUT_PATH
+            value: "/app/volumes/user/cleaned_input.csv"
+          - name: OUTPUT_PATH
+            value: "/app/volumes/user/predictions.json"
         volumeMounts:
-        - name: models-volume
-          mountPath: "/app/volumes/models"
-        - name: user-volume
-          mountPath: "/app/volumes/user"
+          - name: models-volume
+            mountPath: /app/volumes/models
+          - name: user-volume
+            mountPath: /app/volumes/user
       volumes:
-      - name: models-volume
-        persistentVolumeClaim:
-          claimName: models-volume-pvc
-      - name: user-volume
-        persistentVolumeClaim:
-          claimName: user-volume-pvc
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: model-inference-service
-spec:
-  selector:
-    app: model-inference
-  ports:
-    - protocol: TCP
-      port: 5001
-      targetPort: 5001
-  type: ClusterIP
+        - name: models-volume
+          persistentVolumeClaim:
+            claimName: models-volume-pvc
+        - name: user-volume
+          persistentVolumeClaim:
+            claimName: user-volume-pvc
